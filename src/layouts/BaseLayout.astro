@@ -1,0 +1,68 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const root = base.endsWith("/") ? base : `${base}/`;
+const currentPath = Astro.url.pathname;
+const isHome = currentPath === base || currentPath === root;
+const isAbout = currentPath.startsWith(`${root}about`);
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f7fbff" />
+    <link rel="icon" type="image/svg+xml" href={`${root}favicon.svg`} />
+    <title>{title}</title>
+    <script is:inline>
+      const storedTheme = localStorage.getItem("theme");
+      const preferredTheme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.dataset.theme = storedTheme || preferredTheme;
+    </script>
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="topbar">
+        <a class="brand" href={root} aria-label="返回首页">
+          <span class="brand-mark" aria-hidden="true">H</span>
+          <span>hutaao<span class="brand-dot">.</span></span>
+        </a>
+        <nav class="nav-links" aria-label="主要导航">
+          <a class:list={{ "is-active": isHome }} href={root}>首页</a>
+          <span class="nav-soon" aria-label="文章，即将开放">文章</span>
+          <span class="nav-soon" aria-label="学习路径，即将开放">学习路径</span>
+          <span class="nav-soon" aria-label="动态，即将开放">动态</span>
+          <a class:list={{ "is-active": isAbout }} href={`${root}about/`}>关于</a>
+        </nav>
+        <button class="theme-toggle" type="button" aria-label="切换明暗主题">
+          <span class="theme-icon" aria-hidden="true">◐</span>
+          <span class="theme-label">主题</span>
+        </button>
+      </header>
+      <main>
+        <slot />
+      </main>
+      <footer class="footer">
+        <p>在学习中记录，在记录中看见成长。</p>
+        <a href="https://github.com/hutaao" rel="noreferrer">GitHub</a>
+      </footer>
+    </div>
+    <script is:inline>
+      const toggle = document.querySelector(".theme-toggle");
+      toggle?.addEventListener("click", () => {
+        const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+        document.documentElement.dataset.theme = next;
+        localStorage.setItem("theme", next);
+      });
+    </script>
+  </body>
+</html>
