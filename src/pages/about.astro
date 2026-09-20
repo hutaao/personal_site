@@ -1,0 +1,79 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const milestones = [
+  {
+    label: "现在",
+    title: "从大二开始，认真记录学习路径",
+    detail: "不只保存结论，也记录问题、尝试、失败与下一步。",
+  },
+  {
+    label: "持续",
+    title: "连接技术学习与科研笔记",
+    detail: "把零散的知识整理成能复习、能分享、能继续生长的内容。",
+  },
+  {
+    label: "偶尔",
+    title: "留下生活和镜头里的片刻",
+    detail: "短动态与摄影不是旁枝，而是学习之外真实生活的注脚。",
+  },
+];
+---
+
+<BaseLayout
+  title="关于 hutaao｜hutaao 的学习手记"
+  description="认识 hutaao，以及这个博客为什么开始。"
+>
+  <section class="about-hero">
+    <div>
+      <p class="eyebrow"><span></span> ABOUT THIS JOURNEY</p>
+      <h1>你好，<br />我是 <em>hutaao</em>。</h1>
+    </div>
+    <div class="about-lead">
+      <p>
+        一名正在探索技术与科研的大二学生。这个博客从“我今天真正弄懂了什么”出发，慢慢保存一条属于自己的学习路线。
+      </p>
+      <a class="text-link" href="https://github.com/hutaao" rel="noreferrer">在 GitHub 找到我 ↗</a>
+    </div>
+  </section>
+
+  <section class="about-grid" aria-label="关于博客">
+    <article class="about-card about-card-main">
+      <p class="section-kicker">WHY I WRITE</p>
+      <h2>为什么写下来</h2>
+      <p>
+        学习不是一条只向前的直线。写作让我看见知识之间的连接，也让我在很久以后还能找回当时的问题和思考过程。
+      </p>
+      <p>
+        这里会以技术学习与科研笔记为主，也会出现短动态、摄影和阶段性的自我回顾。
+      </p>
+    </article>
+    <aside class="about-card about-card-accent">
+      <span class="about-number">02</span>
+      <p>主要内容</p>
+      <strong>技术 · 科研<br />动态 · 摄影</strong>
+    </aside>
+  </section>
+
+  <section class="journey-section" aria-labelledby="journey-title">
+    <div class="section-heading">
+      <div>
+        <p class="section-kicker">THE JOURNEY</p>
+        <h2 id="journey-title">从这里开始</h2>
+      </div>
+      <p class="journey-intro">站点会和学习一起更新，不假装一开始就拥有全部答案。</p>
+    </div>
+    <div class="journey-list">
+      {milestones.map((item, index) => (
+        <article class="journey-item">
+          <span class="journey-index">0{index + 1}</span>
+          <div>
+            <p class="journey-label">{item.label}</p>
+            <h3>{item.title}</h3>
+            <p>{item.detail}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

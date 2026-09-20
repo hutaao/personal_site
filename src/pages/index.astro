@@ -1,0 +1,123 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const base = import.meta.env.BASE_URL;
+const root = base.endsWith("/") ? base : `${base}/`;
+const notes = [
+  {
+    kind: "科研笔记",
+    title: "怎样把一篇论文读成自己的知识",
+    summary: "从问题、方法到复现实验，建立一套可以持续迭代的阅读记录。",
+    date: "准备中",
+  },
+  {
+    kind: "技术学习",
+    title: "从 C++ 到更大的程序世界",
+    summary: "记录基础、算法与项目练习之间如何连接起来。",
+    date: "准备中",
+  },
+];
+
+const moments = [
+  { time: "今天", text: "把个人博客从一个页面，重新想成一条长期学习路径。", tag: "建站记录" },
+  { time: "最近", text: "正在整理下一阶段想深入学习的方向。", tag: "学习中" },
+];
+---
+
+<BaseLayout
+  title="hutaao 的学习手记"
+  description="记录技术、科研与一路上的新发现。"
+>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <p class="eyebrow"><span></span> UNDERGRADUATE · LEARNING LOG</p>
+      <h1 id="hero-title">把好奇心，<br /><em>写成看得见的路径。</em></h1>
+      <p class="hero-intro">
+        你好，我是 hutaao。这里记录技术学习、科研笔记，以及偶尔路过镜头的生活片段。
+      </p>
+      <div class="hero-actions">
+        <a class="button button-primary" href="#latest">阅读最新笔记 <span aria-hidden="true">→</span></a>
+        <a class="button button-quiet" href={`${root}about/`}>认识我</a>
+      </div>
+      <dl class="hero-meta" aria-label="博客内容概览">
+        <div><dt>主线</dt><dd>技术与科研</dd></div>
+        <div><dt>支线</dt><dd>动态与摄影</dd></div>
+        <div><dt>状态</dt><dd><span class="status-dot"></span>持续记录</dd></div>
+      </dl>
+    </div>
+
+    <div class="media-stage" aria-label="动态头像区域">
+      <div class="orbit orbit-one" aria-hidden="true"></div>
+      <div class="orbit orbit-two" aria-hidden="true"></div>
+      <div class="avatar-shell">
+        <div class="avatar-placeholder" aria-label="hutaao 头像占位符">H</div>
+      </div>
+      <div class="media-note">
+        <span>NOW</span>
+        <strong>正在建立自己的知识坐标</strong>
+      </div>
+      <p class="media-caption">给正在生长的想法，留一个会呼吸的位置。</p>
+    </div>
+  </section>
+
+  <section class="content-grid" id="latest" aria-label="最新内容">
+    <div class="section-main">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">LATEST NOTES</p>
+          <h2>最近写下的</h2>
+        </div>
+        <span class="text-link muted-link">文章系统将在下一阶段开放</span>
+      </div>
+      <div class="notes-list">
+        {notes.map((note, index) => (
+          <article class="note-card">
+            <div class="note-index">0{index + 1}</div>
+            <div class="note-body">
+              <div class="note-meta"><span>{note.kind}</span><time>{note.date}</time></div>
+              <h3>{note.title}</h3>
+              <p>{note.summary}</p>
+            </div>
+            <span class="note-arrow" aria-hidden="true">↗</span>
+          </article>
+        ))}
+      </div>
+    </div>
+
+    <aside class="learning-card">
+      <p class="section-kicker">LEARNING NOW</p>
+      <h2>最近在学</h2>
+      <div class="progress-row">
+        <div class="progress-top"><span>科研阅读方法</span><span>进行中</span></div>
+        <div class="progress-track"><span style="width: 68%"></span></div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-top"><span>算法与 C++</span><span>持续</span></div>
+        <div class="progress-track"><span style="width: 52%"></span></div>
+      </div>
+      <blockquote>“把每一次没弄懂，都变成下一篇笔记的开头。”</blockquote>
+    </aside>
+  </section>
+
+  <section class="moments-preview" aria-labelledby="moments-title">
+    <div class="section-heading moments-heading">
+      <div>
+        <p class="section-kicker">MOMENTS</p>
+        <h2 id="moments-title">片刻与近况</h2>
+      </div>
+      <span class="text-link muted-link">完整动态将在后续阶段开放</span>
+    </div>
+    <div class="moment-list">
+      {moments.map((moment) => (
+        <article class="moment-card">
+          <div class="mini-avatar" aria-hidden="true">H</div>
+          <div>
+            <div class="moment-meta"><strong>hutaao</strong><time>{moment.time}</time></div>
+            <p>{moment.text}</p>
+            <span class="tag">#{moment.tag}</span>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
