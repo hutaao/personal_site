@@ -1,0 +1,501 @@
+/* Firefly's fullscreen entrance, followed by Shirone's opaque reading surface. */
+
+@font-face {
+	font-family: "Firefly Zen Maru Gothic";
+	font-style: normal;
+	font-weight: 700;
+	font-display: swap;
+	src: url("../../public/assets/fonts/firefly/zen-maru-gothic-700-latin.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "Firefly Inter";
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url("../../public/assets/fonts/firefly/inter-400-latin.woff2") format("woff2");
+}
+
+.firefly-entrance {
+	display: none;
+}
+
+body[data-current-page="home"] {
+	--firefly-progress: 0;
+	--banner-stage-height: 100svh;
+	--banner-panel-overlap: 0px;
+	--banner-content-top: var(--banner-stage-height);
+}
+
+body[data-current-page="home"] #banner-wrapper {
+	visibility: hidden;
+	pointer-events: none;
+}
+
+body[data-current-page="home"] .firefly-entrance {
+	display: block;
+	position: absolute;
+	z-index: 10;
+	inset: 0 0 auto;
+	height: 100svh;
+	overflow: hidden;
+	opacity: 1;
+	pointer-events: none;
+}
+
+.firefly-entrance__image {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+	filter: none;
+	transform: none;
+}
+
+.firefly-entrance__dim {
+	position: absolute;
+	inset: 0;
+	background: rgb(0 0 0 / 20%);
+}
+
+/* The image and all entrance content leave together in normal page scrolling. */
+.firefly-entrance::after {
+	content: "";
+	position: absolute;
+	z-index: 1;
+	inset: auto 0 0;
+	height: clamp(4rem, 12svh, 8rem);
+	background: linear-gradient(to bottom, transparent, var(--page-bg));
+	pointer-events: none;
+}
+
+.firefly-entrance__header {
+	display: none;
+	position: absolute;
+	z-index: 3;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 4.5rem;
+	pointer-events: auto;
+}
+
+.firefly-entrance__nav-shell {
+	display: grid;
+	grid-template-columns: minmax(15rem, 1fr) auto minmax(8rem, 1fr);
+	align-items: center;
+	width: min(92vw, var(--page-width));
+	height: 100%;
+	margin-inline: auto;
+	font-family: "Firefly Inter", system-ui, sans-serif;
+	font-weight: 700;
+	color: rgb(0 0 0 / 75%);
+}
+
+.firefly-entrance__brand,
+.firefly-entrance__links a,
+.firefly-entrance__actions button {
+	display: flex;
+	align-items: center;
+	color: inherit;
+	text-decoration: none;
+	text-shadow: none;
+}
+
+.firefly-entrance__brand {
+	justify-self: start;
+	gap: 0.55rem;
+	font-size: 1.125rem;
+}
+
+.firefly-entrance__brand img {
+	width: 1.75rem;
+	height: 1.75rem;
+	object-fit: contain;
+}
+
+.firefly-entrance__links {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.25rem;
+}
+
+.firefly-entrance__links a {
+	gap: 0.38rem;
+	height: 2.75rem;
+	padding-inline: 0.75rem;
+	border-radius: 0.5rem;
+	font-size: 1rem;
+	transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.firefly-entrance__links a:first-child {
+	color: rgb(0 0 0 / 75%);
+	box-shadow: inset 0 -2px 0 currentColor;
+}
+
+.firefly-entrance__links a:hover,
+.firefly-entrance__actions button:hover {
+	color: rgb(0 0 0 / 90%);
+	background: rgb(255 255 255 / 20%);
+}
+
+.firefly-entrance__links svg,
+.firefly-entrance__actions svg {
+	width: 1.25rem;
+	height: 1.25rem;
+}
+
+.firefly-entrance__links .firefly-entrance__menu-arrow {
+	width: 1rem;
+	height: 1rem;
+	margin-left: -0.2rem;
+}
+
+.dark .firefly-entrance__nav-shell {
+	color: rgb(255 255 255 / 75%);
+}
+
+.dark .firefly-entrance__links a:first-child {
+	color: rgb(255 255 255 / 75%);
+}
+
+.dark .firefly-entrance__links a:hover,
+.dark .firefly-entrance__actions button:hover {
+	color: rgb(255 255 255 / 90%);
+	background: rgb(0 0 0 / 20%);
+}
+
+.firefly-entrance__actions {
+	display: flex;
+	justify-self: end;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.firefly-entrance__actions button {
+	justify-content: center;
+	width: 2.75rem;
+	height: 2.75rem;
+	border: 0;
+	border-radius: 0.5rem;
+	background: transparent;
+	cursor: pointer;
+}
+
+.firefly-entrance__copy {
+	position: absolute;
+	z-index: 2;
+	top: 50%;
+	left: 50%;
+	width: 75%;
+	transform: translate(-50%, -50%);
+	text-align: center;
+	color: white;
+	pointer-events: auto;
+}
+
+.firefly-entrance__copy h1 {
+	margin: 0 0 1rem;
+	font-family: "Firefly Zen Maru Gothic", system-ui, sans-serif;
+	font-size: 4.5rem;
+	font-weight: 700;
+	line-height: 1.25;
+	overflow-wrap: break-word;
+	text-shadow: 0 4px 24px rgb(0 0 0 / 60%);
+	animation: firefly-fade-in-up 0.3s ease-out;
+}
+
+.firefly-entrance__copy p {
+	margin: 0;
+	font-family: "Firefly Inter", system-ui, sans-serif;
+	font-size: 1.5rem;
+	font-weight: 400;
+	line-height: 1.4;
+	color: rgb(255 255 255 / 90%);
+	text-shadow: 0 2px 16px rgb(0 0 0 / 60%);
+	animation: firefly-fade-in-up 0.3s ease-out 0.3s both;
+}
+
+.firefly-entrance__socials {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75rem;
+	margin-top: 1.25rem;
+	animation: firefly-fade-in-up 0.3s ease-out 0.45s both;
+}
+
+.firefly-entrance__socials a {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.45rem;
+	min-width: 2.75rem;
+	height: 2.75rem;
+	padding-inline: 0.75rem;
+	border: 1px solid rgb(255 255 255 / 18%);
+	border-radius: 0.75rem;
+	background: rgb(255 255 255 / 14%);
+	backdrop-filter: blur(8px);
+	color: white;
+	text-decoration: none;
+	transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.firefly-entrance__socials a:hover {
+	background: rgb(255 255 255 / 24%);
+	transform: translateY(-2px);
+}
+
+.firefly-entrance__socials svg {
+	width: 1.25rem;
+	height: 1.25rem;
+}
+
+.firefly-entrance__scroll {
+	position: absolute;
+	z-index: 3;
+	bottom: 5rem;
+	left: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 5rem;
+	height: 5rem;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	color: white;
+	filter: drop-shadow(0 2px 8px rgb(0 0 0 / 55%));
+	transform: translateX(-50%);
+	animation: firefly-bounce 2s infinite;
+	cursor: pointer;
+	pointer-events: auto;
+}
+
+.firefly-entrance__scroll svg {
+	width: 5rem;
+	height: 5rem;
+}
+
+body[data-current-page="home"][data-banner-scrolled="true"] .firefly-entrance__header,
+body[data-current-page="home"][data-banner-scrolled="true"] .firefly-entrance__scroll {
+	pointer-events: none;
+}
+
+body[data-current-page="home"] #navbar-wrapper {
+	/* A transformed sticky ancestor traps TopAppBar's fixed positioning. */
+	position: fixed;
+	inset: 0 0 auto;
+	height: 4.5rem;
+	opacity: 0;
+	visibility: hidden;
+	transform: none;
+	transition: opacity 180ms ease, visibility 180ms ease;
+}
+
+body[data-current-page="home"][data-banner-scrolled="true"] #navbar-wrapper {
+	opacity: 1;
+	visibility: visible;
+}
+
+body[data-current-page="home"] #navbar {
+	background: var(--surface-container);
+	backdrop-filter: none;
+}
+
+body[data-current-page="home"] .top-app-bar__nav-link {
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+
+body[data-current-page="home"]:not([data-banner-scrolled="true"]) #navbar-wrapper {
+	pointer-events: none;
+}
+
+body[data-current-page="home"][data-banner-scrolled="true"]
+	.firefly-entrance__copy {
+	pointer-events: none;
+}
+
+body[data-current-page="home"] #main-layout {
+	isolation: isolate;
+	scroll-margin-top: 5rem;
+}
+
+body[data-current-page="home"] #main-layout::before {
+	content: "";
+	position: absolute;
+	z-index: -1;
+	inset: 0;
+	min-height: 100%;
+	background: var(--page-bg);
+	pointer-events: none;
+}
+
+@keyframes firefly-fade-in-up {
+	from {
+		opacity: 0;
+		transform: translateY(30px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes firefly-bounce {
+	0%, 100% { transform: translate(-50%, 0); }
+	50% { transform: translate(-50%, 0.8rem); }
+}
+
+@media (max-width: 1023.98px) {
+	.firefly-entrance__nav-shell {
+		grid-template-columns: 1fr auto;
+		width: calc(100% - 2rem);
+	}
+
+	.firefly-entrance__links {
+		display: none;
+	}
+
+	.firefly-entrance__actions button[data-firefly-action="search"],
+	.firefly-entrance__actions button[data-firefly-action="music"] {
+		display: none;
+	}
+
+	.firefly-entrance__copy {
+		width: calc(100% - 2rem);
+		transform: translate(-50%, -50%);
+	}
+
+	.firefly-entrance__copy h1 {
+		font-size: min(3rem, 10vw);
+		line-height: 1.1;
+	}
+
+	.firefly-entrance__copy p {
+		font-size: 1rem;
+		line-height: 1.3;
+	}
+
+	.firefly-entrance__scroll {
+		bottom: 6.5rem;
+		width: 4rem;
+		height: 4rem;
+	}
+
+	.firefly-entrance__scroll svg {
+		width: 4rem;
+		height: 4rem;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.firefly-entrance__image {
+		filter: none;
+		transform: none;
+	}
+
+	.firefly-entrance__header {
+		transform: none;
+	}
+
+	.firefly-entrance__copy {
+		transform: translate(-50%, -50%);
+	}
+
+	.firefly-entrance__copy h1,
+	.firefly-entrance__copy p,
+.firefly-entrance__socials,
+	.firefly-entrance__scroll {
+		animation: none;
+	}
+}
+/* Visitor display preferences: one shared photo stage, without reloads. */
+html[data-wallpaper-switching] .firefly-entrance {
+ transition:height var(--m3e-duration-long) var(--m3e-easing-standard), opacity var(--m3e-duration-long) var(--m3e-easing-standard);
+}
+html[data-wallpaper-switching] .firefly-entrance__image {
+ transition:transform var(--m3e-duration-long) var(--m3e-easing-standard), filter var(--m3e-duration-long) var(--m3e-easing-standard), opacity var(--m3e-duration-long) var(--m3e-easing-standard);
+}
+html.display-changing #main-layout,
+html.display-changing #top-row {transition:none !important;}
+html[data-preview-mode="banner"] body[data-current-page="home"] {
+ --banner-stage-height: 65svh;
+ --banner-content-top: 65svh;
+}
+html[data-preview-mode="banner"] body[data-current-page="home"] .firefly-entrance {height:65svh;}
+html[data-preview-mode="banner"] .firefly-entrance__scroll {display:none;}
+html[data-preview-title="false"] .firefly-entrance__copy {display:none;}
+html[data-preview-mode="none"] body[data-current-page="home"],
+html[data-preview-mode="overlay"] body[data-current-page="home"] {
+ --banner-stage-height:5.5rem;
+ --banner-content-top:5.5rem;
+}
+html[data-preview-mode="none"] .firefly-entrance {display:none !important;}
+html[data-preview-mode="none"] body[data-current-page="home"] #main-layout,
+html[data-preview-mode="overlay"] body[data-current-page="home"] #main-layout {top:5.5rem !important;}
+html[data-preview-mode="none"] body[data-current-page="home"] #top-row,
+html[data-preview-mode="overlay"] body[data-current-page="home"] #top-row {height:1rem !important;}
+html[data-preview-mode="overlay"] .firefly-entrance,
+html[data-preview-mode="fullscreen"][data-preview-layout="hero"] .firefly-entrance {
+ display:block; position:fixed; z-index:0; inset:0; height:100svh;
+}
+html[data-preview-mode="overlay"] .firefly-entrance__copy,
+html[data-preview-mode="overlay"] .firefly-entrance__scroll,
+html[data-preview-mode="overlay"] .firefly-entrance::after,
+html[data-preview-mode="fullscreen"][data-preview-layout="hero"] .firefly-entrance::after,
+html[data-preview-mode="fullscreen"][data-preview-layout="hero"] body:not([data-current-page="home"]) .firefly-entrance__copy,
+html[data-preview-mode="fullscreen"][data-preview-layout="hero"] body:not([data-current-page="home"]) .firefly-entrance__scroll {display:none;}
+html[data-preview-mode="overlay"] #banner-wrapper,
+html[data-preview-mode="fullscreen"][data-preview-layout="hero"] #banner-wrapper {visibility:hidden;pointer-events:none;}
+html[data-preview-mode="overlay"] .firefly-entrance__image {
+ opacity:var(--wallpaper-opacity); filter:blur(var(--wallpaper-blur)); transform:scale(1.04);
+}
+html[data-preview-mode="fullscreen"][data-preview-layout="hero"] .firefly-entrance__image {
+ filter:blur(calc(var(--wallpaper-blur) * var(--firefly-blur-progress, 1))); transform:scale(1.04);
+}
+html[data-preview-mode="fullscreen"][data-preview-layout="hero"] body:not([data-current-page="home"]) .firefly-entrance__image {
+ filter:blur(var(--wallpaper-blur));
+}
+html[data-preview-mode="fullscreen"][data-preview-layout="hero"] .firefly-entrance__copy {
+ transform:translate(-50%,calc(-50% - var(--firefly-scroll, 0px)));
+ opacity:clamp(0,calc(1 - var(--firefly-progress, 0) * 2),1);
+}
+html[data-preview-mode="fullscreen"][data-preview-layout="hero"] .firefly-entrance__scroll {
+ opacity:calc(1 - var(--firefly-progress, 0));
+}
+html[data-preview-mode="overlay"] body,
+html[data-preview-mode="fullscreen"][data-preview-layout="hero"] body {
+ --card-bg:color-mix(in srgb, var(--surface-container-lowest) var(--wallpaper-card-opacity), transparent);
+}
+html.dark[data-preview-mode="overlay"] body,
+html.dark[data-preview-mode="fullscreen"][data-preview-layout="hero"] body {
+ --card-bg:color-mix(in srgb, var(--surface-container-high) var(--wallpaper-card-opacity), transparent);
+}
+html[data-preview-mode="overlay"] #main-layout::before,
+html[data-preview-mode="fullscreen"][data-preview-layout="hero"] #main-layout::before {background:transparent;}
+html[data-preview-mode="overlay"] .card-base,
+html[data-preview-mode="fullscreen"][data-preview-layout="hero"] .card-base {backdrop-filter:blur(4px);}
+html[data-preview-mode="overlay"] #navbar,
+html[data-preview-mode="fullscreen"][data-preview-layout="hero"] #navbar {
+ background:var(--surface-container);backdrop-filter:none;
+}
+html[data-preview-mode="banner"][data-preview-gradient="false"] .firefly-entrance::after {display:none;}
+.firefly-entrance__waves {display:none;position:absolute;z-index:2;inset:auto 0 0;height:6rem;color:var(--page-bg);pointer-events:none;}
+html[data-preview-mode="banner"][data-preview-waves="true"] .firefly-entrance__waves {display:block;}
+html[data-preview-mode="fullscreen"][data-preview-layout="classic"][data-preview-waves="true"] .firefly-entrance__waves {display:block;opacity:0;transition:opacity var(--m3e-duration-medium) var(--m3e-easing-standard);}
+html[data-preview-mode="fullscreen"][data-preview-layout="classic"] .firefly-entrance::after {opacity:0;transition:opacity var(--m3e-duration-medium) var(--m3e-easing-standard);}
+html[data-preview-mode="fullscreen"][data-preview-layout="classic"] body[data-entrance-revealed="true"] .firefly-entrance__waves,
+html[data-preview-mode="fullscreen"][data-preview-layout="classic"] body[data-entrance-revealed="true"] .firefly-entrance::after {opacity:1;}
+html[data-preview-mode="fullscreen"][data-preview-layout="classic"] body[data-entrance-revealed="true"] .firefly-entrance__scroll {opacity:0;pointer-events:none;}
+html[data-preview-gradient="false"] .firefly-entrance::after {display:none;}
+html[data-preview-waves="false"] .banner-waves {display:none;}
+html.motion-reduced .firefly-entrance__scroll,
+html.motion-reduced .firefly-entrance__copy * {animation:none;}
+@media(prefers-reduced-motion:reduce) {.firefly-entrance__waves path {animation:none;}}
