@@ -1,44 +1,38 @@
 # hutaao 的学习手记
 
-记录技术学习、科研笔记，以及学习之外的动态与摄影。
+基于 Astro、Shirone 和 Firefly 入场效果的个人博客，用于记录技术学习、科研与生活。
 
-## 当前版本
+## 本地运行
 
-`v1.0.0`：完成首页、关于页、明暗主题、响应式布局和动态媒体预留区域。
+需要 Node.js 22.12 以上和 pnpm 9.14.4。
 
-## 本地查看
-
-```powershell
-npm install
-npm run dev
+```sh
+pnpm install --frozen-lockfile
+pnpm dev -- --port 4324
 ```
 
-打开终端显示的本地地址。修改 `src/` 中的文件并保存后，浏览器会自动刷新。
+主仓库预览地址为 `http://localhost:4324/personal_site/`。GitHub Pages 子路径已配置为 `/personal_site/`。
 
-构建最终网页：
-
-```powershell
-npm run build
+```sh
+pnpm astro check
+pnpm build
 ```
 
-`dist/` 是自动生成的构建结果，不应直接修改。
+## 内容与外观
 
-## 目录
+- 站点设置：`src/config/siteConfig.ts`
+- 个人资料：`src/config/profileConfig.ts`
+- 侧栏排列：`src/config/sidebarConfig.ts`
+- 文章：`src/content/posts/`
+- 动态：`src/content/moments/`
+- 壁纸与头像：`src/assets/images/hutaao/`
 
-- `src/pages/`：首页、关于页和以后新增的页面。
-- `src/layouts/`：全站导航、页脚和公共结构。
-- `src/styles/`：颜色、排版、毛玻璃和响应式样式。
-- `public/`：头像、图片、视频和网站图标等公开素材。
+调色盘提供外观、壁纸和特效三组设置，保存访问者的本地偏好。保留 Firefly 全屏入场与 Shirone 阅读区域，支持 Classic 和 Hero 布局。
 
-## 设计方向
+当前文章、动态等仍包含主题示例内容，后续可逐步替换。
 
-- 以天依蓝为主要色彩，采用清透氛围与分区明确的信息卡片结构。
-- 主要参考 [Fqzlr 动态页](https://blog.fqzlr.top/moments/#moment-2026-09-02-xinzhuang) 的功能分区、毛玻璃内容承载和动态信息组织方式。
-- 其他参考站只保留较低权重，用于补充阅读体验和功能思路。
-- 只借鉴信息组织和交互原则，页面视觉、文案和实现保持独立。
+## 来源与许可
 
-## 协作流程
+主题基于 [LyraVoid/Shirone](https://github.com/LyraVoid/Shirone)，入场效果与樱花参考 [CuteLeaf/Firefly](https://github.com/CuteLeaf/Firefly)。保留原主题署名及 MIT 许可，见 `LICENSE` 和 `THIRD_PARTY_LICENSES/Firefly-LICENSE`。内容许可配置与素材各自的许可独立。
 
-每个阶段遵循：本地开发 → 本地验证 → 用户审核 → commit → push。
-
-未经阶段审核，不推送到远端仓库。
+推送源码不会自动启用 GitHub Pages 部署。

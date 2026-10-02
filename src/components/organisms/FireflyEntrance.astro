@@ -1,0 +1,120 @@
+---
+import { Image } from "astro:assets";
+import { Icon } from "astro-icon/components";
+import BannerWaves from "@components/molecules/BannerWaves.astro";
+import fireflyDark from "@/assets/images/firefly/firefly-dark.png";
+import fireflyLight from "@/assets/images/firefly/firefly-light.png";
+import background from "@/assets/images/hutaao/background.png";
+import { siteConfig } from "@/config";
+import { url } from "@utils/url-utils";
+
+const links = [
+	{ name: "主页", icon: "material-symbols:home-rounded", href: url("/") },
+	{ name: "文章", icon: "material-symbols:article-rounded", href: url("/archive/"), menu: true },
+	{ name: "社交", icon: "material-symbols:groups-rounded", href: url("/friends/"), menu: true },
+	{ name: "我的", icon: "material-symbols:person-rounded", href: url("/moments/"), menu: true },
+	{ name: "关于", icon: "material-symbols:info-rounded", href: url("/about/"), menu: true },
+	{ name: "链接", icon: "material-symbols:link-rounded", href: "https://github.com/hutaao", external: true, menu: true },
+];
+---
+
+<!--
+	Firefly fullscreen entrance ported for this local comparison preview.
+	Original project: CuteLeaf/Firefly (MIT); see THIRD_PARTY_LICENSES/Firefly-LICENSE.
+-->
+<section id="firefly-entrance" class="firefly-entrance" aria-label="首页首屏">
+	<Image
+		src={background}
+		alt=""
+		class="firefly-entrance__image"
+		widths={[640, 828, 1280, 1920]}
+		sizes="100vw"
+		loading="eager"
+		fetchpriority="high"
+		quality={85}
+	/>
+	<div class="firefly-entrance__dim" aria-hidden="true"></div>
+	<div class="firefly-entrance__waves" aria-hidden="true">
+		<BannerWaves idPrefix="firefly-banner" />
+	</div>
+
+	<header class="firefly-entrance__header">
+		<div class="firefly-entrance__nav-shell">
+			<a class="firefly-entrance__brand" href={url("/")} aria-label="返回首页">
+				<picture>
+					<source srcset={fireflyDark.src} media="(prefers-color-scheme: dark)" />
+					<img src={fireflyLight.src} alt="" width="32" height="32" />
+				</picture>
+				<span>{siteConfig.title}</span>
+			</a>
+
+			<nav class="firefly-entrance__links" aria-label="首屏导航">
+				{links.map((link) => (
+					<a
+						href={link.href}
+						target={link.external ? "_blank" : undefined}
+						rel={link.external ? "noopener noreferrer" : undefined}
+					>
+						<Icon name={link.icon} />
+						<span>{link.name}</span>
+						{link.menu && <Icon class="firefly-entrance__menu-arrow" name="material-symbols:keyboard-arrow-down-rounded" />}
+					</a>
+				))}
+			</nav>
+
+			<div class="firefly-entrance__actions">
+				<button type="button" data-firefly-action="search" aria-label="搜索">
+					<Icon name="material-symbols:search-rounded" />
+				</button>
+				<button type="button" data-firefly-action="music" aria-label="音乐">
+					<Icon name="material-symbols:music-note-rounded" />
+				</button>
+				<button type="button" data-firefly-action="theme" aria-label="切换明暗主题">
+					<Icon name="material-symbols:light-mode-outline-rounded" />
+				</button>
+			</div>
+		</div>
+	</header>
+
+	<div class="firefly-entrance__copy">
+		<h1>{siteConfig.banner.homeText.title}</h1>
+		<p>{siteConfig.banner.homeText.subtitle[0]}</p>
+		<div class="firefly-entrance__socials">
+			<a href="https://github.com/hutaao" target="_blank" rel="noopener noreferrer">
+				<Icon name="fa6-brands:github" />
+				<span>GitHub</span>
+			</a>
+			<a href={url("/rss.xml")} aria-label="RSS">
+				<Icon name="material-symbols:rss-feed-rounded" />
+			</a>
+		</div>
+	</div>
+
+	<button class="firefly-entrance__scroll" type="button" aria-label="向下查看内容">
+		<Icon name="material-symbols:keyboard-arrow-down-rounded" />
+	</button>
+</section>
+
+<script>
+	function bindFireflyEntrance() {
+		const entrance = document.getElementById("firefly-entrance");
+		if (!entrance || entrance.dataset.bound === "true") return;
+		entrance.dataset.bound = "true";
+
+		entrance.querySelector<HTMLButtonElement>(".firefly-entrance__scroll")?.addEventListener("click", () => {
+			document.getElementById("main-layout")?.scrollIntoView({ behavior: "smooth" });
+		});
+		entrance.querySelector<HTMLButtonElement>('[data-firefly-action="theme"]')?.addEventListener("click", () => {
+			(document.getElementById("scheme-switch") as HTMLButtonElement | null)?.click();
+		});
+		entrance.querySelector<HTMLButtonElement>('[data-firefly-action="search"]')?.addEventListener("click", () => {
+			(document.getElementById("search-input-desktop") as HTMLElement | null)?.click();
+		});
+		entrance.querySelector<HTMLButtonElement>('[data-firefly-action="music"]')?.addEventListener("click", () => {
+			(document.querySelector('[aria-label="播放"], [aria-label="暂停"]') as HTMLButtonElement | null)?.click();
+		});
+	}
+
+	bindFireflyEntrance();
+	document.addEventListener("swup:page:view", bindFireflyEntrance);
+</script>
