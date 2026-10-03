@@ -19,7 +19,7 @@ export const zh_CN: Translation = {
 	[Key.siteInfoAddress]: "站点地址",
 	[Key.siteInfoFramework]: "Astro 版本",
 	[Key.siteInfoNode]: "Node.js 版本",
-	[Key.siteInfoBuilt]: "构建时间",
+	[Key.siteInfoBuilt]: "最后更新",
 	[Key.siteInfoExpand]: "展开更多信息",
 	[Key.siteInfoCollapse]: "收起信息",
 	[Key.calendarActivity]: "更新足迹",

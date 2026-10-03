@@ -319,7 +319,7 @@ html[data-preview-mode="fullscreen"] body[data-current-page="home"]:not([data-ba
 	pointer-events: none;
 }
 
-body[data-current-page="home"][data-banner-scrolled="true"]
+html[data-preview-mode="fullscreen"] body[data-current-page="home"][data-banner-scrolled="true"]
 	.firefly-entrance__copy {
 	pointer-events: none;
 }

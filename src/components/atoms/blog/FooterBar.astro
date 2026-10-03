@@ -18,6 +18,7 @@ interface Props {
 	poweredBy?: FooterLink[];
 	version?: string;
 	versionHref?: string;
+	contentLicense?: FooterLink;
 	/** 自定义注入的页脚 HTML（来自 FooterConfig.html） */
 	customHtml?: string;
 	class?: string;
@@ -30,6 +31,7 @@ const {
 	poweredBy = [],
 	version = "",
 	versionHref = "",
+	contentLicense,
 	customHtml = "",
 	class: className,
 } = Astro.props;
@@ -40,7 +42,7 @@ const {
 	<div class="m3-blog-footer__inner">
 		{customHtml && <div class="m3-blog-footer__custom" set:html={customHtml} />}
 		<p class="m3-blog-footer__text">
-			&copy; {year} {name}. All Rights Reserved.
+			&copy; {year} {name}.
 			{links.map((l) => (
 				<Fragment>
 					<span class="m3-blog-footer__sep" aria-hidden="true">/</span>
@@ -53,6 +55,11 @@ const {
 				</Fragment>
 			))}
 		</p>
+		{contentLicense && (
+			<p class="m3-blog-footer__text">
+				除另有注明外，本站原创内容采用 <a href={contentLicense.href} target="_blank" rel="noopener noreferrer">{contentLicense.label}</a>；第三方素材遵循各自许可。
+			</p>
+		)}
 		{poweredBy.length > 0 && (
 			<p class="m3-blog-footer__text">
 				Powered by{" "}

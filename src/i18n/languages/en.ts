@@ -23,7 +23,7 @@ export const en: Translation = {
 	[Key.siteInfoAddress]: "Site address",
 	[Key.siteInfoFramework]: "Astro version",
 	[Key.siteInfoNode]: "Node.js version",
-	[Key.siteInfoBuilt]: "Build time",
+	[Key.siteInfoBuilt]: "Last updated",
 	[Key.siteInfoExpand]: "Show more information",
 	[Key.siteInfoCollapse]: "Show less information",
 	[Key.calendarActivity]: "Update activity",
