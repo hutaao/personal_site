@@ -32,7 +32,7 @@
 1. 在 [`src/config/siteConfig.ts`](src/config/siteConfig.ts) 和 [`astro.config.mjs`](astro.config.mjs) 中确认 `site`、`base` 与站点标识。
 2. 安装锁定依赖：`pnpm.cmd install --frozen-lockfile`。
 3. 执行发布前检查：`npx.cmd astro check`、`pnpm.cmd check:manifest`、`pnpm.cmd type-check`；涉及页面或交互时，再运行对应的 Playwright 用例。
-4. 构建：`pnpm.cmd build`（等价于 `astro build`），确认 `dist/` 生成且无构建错误。
+4. 构建：`pnpm.cmd build`（包含内容同步、图标与缩略图生成、Astro、Pagefind 和字体检查），确认 `dist/` 生成且无构建错误。
 5. 在托管平台配置：
    - Install：`pnpm install --frozen-lockfile`
    - Build：`pnpm build`
@@ -41,9 +41,9 @@
 
 ## CI 对照
 
-GitHub Actions 的 [`ci.yml`](.github/workflows/ci.yml) 运行 Biome、`astro check`、清单校验与单元测试，并在 Node.js 22/24 上分别执行 `pnpm build`。本地发布前应至少复现同一组命令；`ci.yml` 不负责部署到具体托管平台。
+GitHub Actions 的 [pages.yml](.github/workflows/pages.yml) 使用 Node.js 24 与 pnpm 9.14.4，安装锁定依赖，运行 Astro 检查、日历单元测试和完整生产构建。main 分支推送后自动部署到 GitHub Pages。
 
-使用独立内容仓库时，另有两个流程：[`deploy.yml.example`](.github/workflows/deploy.yml.example) 是双仓构建与部署的示例（复制为 `deploy.yml` 后补全部署步骤），[`content-validate.yml`](.github/workflows/content-validate.yml) 是供内容仓调用的可复用校验流程。
+本机 Obsidian 写作库不上传；云端构建使用仓库中已提交的公开内容。
 
 ## 重要边界
 
