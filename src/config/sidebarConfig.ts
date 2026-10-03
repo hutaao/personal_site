@@ -97,6 +97,13 @@ export const sidebarConfig: SidebarConfig = withUserConfig("sidebar", {
 			],
 		},
 		{
+			type: "moments",
+			enable: true,
+			slot: "top",
+			column: "secondary",
+			limit: 3,
+		},
+		{
 			type: "stats",
 			enable: true,
 			slot: "top",
@@ -104,6 +111,7 @@ export const sidebarConfig: SidebarConfig = withUserConfig("sidebar", {
 			pages: ["home", "archive", "categories", "tags"],
 		},
 		{ type: "calendar", enable: true, slot: "top", column: "secondary" },
+		{ type: "siteInfo", enable: true, slot: "top", column: "secondary" },
 		{
 			type: "toc",
 			enable: true,

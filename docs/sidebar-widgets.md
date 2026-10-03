@@ -21,6 +21,8 @@ SideBar 通过 `src/config/sidebarConfig.ts` 中的 `components` 数组动态编
 | `announcement` | `Announcement` | top | 独立公告卡片（由 `announcementConfig.ts` 驱动） |
 | `stats` | `SiteStats` | top | 站点统计规格表 |
 | `calendar` | `Calendar` | sticky | 月度文章历（SSR 直出 + 水合岛） |
+| `moments` | `MomentsSidebar` | top | 最新动态摘要（置顶优先、链接到原动态） |
+| `siteInfo` | `SiteInfo` | top | 站点托管平台、主题、许可与可展开的构建信息 |
 | `music` | `MusicSidebar` | top | 持久音乐播放器（全局配置 + widget 双开关，默认关闭） |
 | `toc` | `SidebarTOC` | sticky | 当前文章目录（通常只在文章页显示） |
 
@@ -88,9 +90,27 @@ interface SidebarWidgetBase {
 
 ## 7. Calendar — 月度文章历
 
-- **数据源**：`src/utils/calendar-data.ts`（文章日期聚合）；
+- **数据源**：`src/utils/calendar-data.ts`（非草稿文章发布/修改日期与动态日期聚合）；
 - **渲染**：`CalendarView.svelte`（`client:visible` 水合岛）；
 - **页面范围**：全页面通用。
+
+日历下方展示最近 16 周的贡献方格，深浅表示每日更新条目数量（0、1、2、3、4+）。
+同一文章同日发布并修改只计一次；文章 frontmatter 的日历日期不转时区，
+动态时间戳与“今天”按 `siteConfig.timeZone` 换算。点击有更新的方格会切换月份、
+展开当天条目，并可导航到对应文章或动态锚点。不查询 GitHub API，不生成虚拟贡献数据。
+
+### 7.1 MomentsSidebar — 动态摘要
+
+`{ type: "moments", enable: true, slot: "top", column: "secondary", limit: 3 }`
+在 `momentsConfig.enable` 与 widget 开关均开启时按需渲染。纯 SSR，摘要来自站点自己的
+动态 Markdown，图片动态使用本地化提示；时间戳遵守站点时区。无动态时不输出卡片。
+
+### 7.2 SiteInfo — 站点信息
+
+`{ type: "siteInfo", enable: true, slot: "top", column: "secondary" }`
+纯 SSR 展示托管平台、Shirone 实际版本与开启的内容许可；原生 `details` 可展开
+站点地址、Astro/Node.js 版本、构建时间。构建时间是静态页面生成时间，不是最近更新
+或访问时间。关闭 widget 时不导入该组件，不产生外部请求。
 
 ---
 

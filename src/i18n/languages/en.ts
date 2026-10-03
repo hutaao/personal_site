@@ -2,6 +2,37 @@ import Key from "../i18nKey-runtime.mjs";
 import type { Translation } from "../translation.ts";
 
 export const en: Translation = {
+	[Key.social]: "Social",
+	[Key.guestbook]: "Guestbook",
+	[Key.guestbookDescription]:
+		"Leave a little footprint and share your thoughts or suggestions.",
+	[Key.guestbookFriendly]: "Keep the conversation kind and respectful.",
+	[Key.guestbookSuggestions]:
+		"Share your ideas or suggest ways to improve this site.",
+	[Key.guestbookThanks]:
+		"Thanks for visiting. Every message starts a conversation.",
+	[Key.guestbookUnavailable]: "Messages are not open yet",
+	[Key.guestbookUnavailableHint]:
+		"The guestbook is being prepared. Come say hello when it opens.",
+	[Key.momentsViewAll]: "View all moments",
+	[Key.momentsImageUpdate]: "Image update",
+	[Key.siteInfo]: "Site information",
+	[Key.siteInfoPlatform]: "Hosting",
+	[Key.siteInfoTheme]: "Theme",
+	[Key.siteInfoLicense]: "Content license",
+	[Key.siteInfoAddress]: "Site address",
+	[Key.siteInfoFramework]: "Astro version",
+	[Key.siteInfoNode]: "Node.js version",
+	[Key.siteInfoBuilt]: "Build time",
+	[Key.siteInfoExpand]: "Show more information",
+	[Key.siteInfoCollapse]: "Show less information",
+	[Key.calendarActivity]: "Update activity",
+	[Key.calendarActivityHint]:
+		"Posts, edits and moments over the last {days} days",
+	[Key.calendarActivityDay]: "{date}: {count} updates",
+	[Key.calendarActivityLess]: "Less",
+	[Key.calendarActivityMore]: "More",
+	[Key.calendarActivityEntries]: "{count} updates",
 	[Key.home]: "Home",
 	[Key.about]: "About",
 	[Key.archive]: "Archive",

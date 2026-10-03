@@ -23,8 +23,8 @@ const isExternal =
 const closeDuration = Number(config.closeDuration ?? 86400);
 ---
 
-<!-- 组件显示由 sidebarConfig 统一控制，有内容时渲染 -->
-{contentText && (
+<!-- 组件显示由 sidebarConfig 统一控制；空公告保留板块。 -->
+{(
 	<WidgetLayout
 		name={config.title || i18n(I18nKey.announcement)}
 		id="announcement"
@@ -38,7 +38,7 @@ const closeDuration = Number(config.closeDuration ?? 86400);
 			</div>
 
 			<!-- 可选链接和关闭按钮 -->
-			{(hasLink || config.closable) && (
+			{(hasLink || (contentText && config.closable)) && (
 				<div class="announcement-actions">
 					<div>
 						{hasLink && (
@@ -78,6 +78,7 @@ const closeDuration = Number(config.closeDuration ?? 86400);
 
 <style lang="stylus">
 .announcement-content
+	min-height: var(--m3e-space-12)
 	font: var(--m3e-type-body-medium)
 	color: var(--on-surface-variant)
 	line-height: 1.6
@@ -167,6 +168,7 @@ const closeDuration = Number(config.closeDuration ?? 86400);
 	}
 
 	function checkAnnouncementClosed() {
+		if (!document.querySelector(".announcement-content")?.textContent?.trim()) return;
 		const widgetLayouts = document.querySelectorAll<HTMLElement>(
 			'widget-layout[data-id="announcement"]',
 		);

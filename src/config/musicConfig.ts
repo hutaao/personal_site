@@ -37,20 +37,20 @@ import { withUserConfig } from "../utils/config-overlay.ts";
  *      首屏直接显示第一首曲目；默认 "none"（不预取，交互后才请求）。
  *    - 示例：
  *      provider: "meting",
- *      meting: { server: "netease", type: "playlist", id: "14164869977" }
+ *      meting: { server: "netease", type: "playlist", id: "YOUR_PLAYLIST_ID" }
  *
  * 4. "mixed"（混合增强模式，推荐）：
  *    - 数据源：本地曲目（src/data/music.ts）+ Meting API 远端歌单自动合并
  *    - 特点：首屏立即可播本地音乐，后台无感拉取远端歌单并在就绪后无缝扩容；
  *            若遇断网或云端接口故障，自动静默降级为本地曲目播放，绝不报红破版。
  *    - 示例：
- *      provider: "mixed",
- *      meting: { server: "netease", type: "playlist", id: "14164869977" }
+ *      provider: "local",
+ *      meting: { server: "netease", type: "playlist", id: "YOUR_PLAYLIST_ID" }
  * ─────────────────────────────────────────────────────────────────────────────
  */
 export const musicConfig: MusicConfig = withUserConfig("music", {
 	enable: true,
-	provider: "mixed",
+	provider: "local",
 	// tracks: [
 	// 	{
 	// 		id: "custom-1",
@@ -61,14 +61,6 @@ export const musicConfig: MusicConfig = withUserConfig("music", {
 	// 		duration: 240,
 	// 	},
 	// ],
-	meting: {
-		server: "netease",
-		type: "playlist",
-		id: "14164869977",
-		// 进入视口时预取歌单元数据（仅元信息，不预取音频流）：
-		// "metadata"（取）| "none"（默认，不取；交互后才请求，卡片显示「尚未请求」占位）
-		preload: "none",
-	},
 	defaultVolume: 0.7,
 	defaultMode: "sequence",
 });
@@ -166,7 +158,7 @@ export function resolveMusicOptions(
 		const metingId = config.meting?.id?.trim();
 		if (playlist.length === 0 && !metingId) return null;
 		return Object.freeze({
-			provider: "mixed",
+			provider: "local",
 			playlist: Object.freeze(playlist),
 			meting: resolveMetingConfig(config.meting),
 			defaultVolume: clampMusicVolume(config.defaultVolume),
@@ -174,7 +166,6 @@ export function resolveMusicOptions(
 		});
 	}
 
-	if (playlist.length === 0) return null;
 
 	return Object.freeze({
 		provider,

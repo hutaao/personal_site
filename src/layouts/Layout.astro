@@ -97,9 +97,9 @@ const hasInitialHomeBanner =
 
 let pageTitle: string;
 if (title) {
-	pageTitle = `${title} - ${siteConfig.title}`;
+	pageTitle = `${title} - hutaao-blog`;
 } else {
-	pageTitle = `${siteConfig.title} - ${siteConfig.subtitle}`;
+	pageTitle = "hutaao-blog";
 }
 
 const favicons: Favicon[] =
@@ -155,7 +155,7 @@ const hasMonoFont =
 		{hasCjkFont && <Font cssVariable={resolvedFontOptions.roles.cjk.cssVariable as never} preload={resolvedFontOptions.roles.cjk.preload} />}
 		{hasMonoFont && <Font cssVariable={resolvedFontOptions.roles.mono.cssVariable as never} preload={resolvedFontOptions.roles.mono.preload} />}
 		{umamiOptions?.websiteId && umamiOptions.scriptUrl && (
-			<script is:inline async src={umamiOptions.scriptUrl} data-website-id={umamiOptions.websiteId} data-auto-track="true"></script>
+			<script is:inline async src={umamiOptions.scriptUrl} data-website-id={umamiOptions.websiteId} data-auto-track="true" data-domains={new URL(siteConfig.site).hostname}></script>
 		)}
 				{favicons.map(favicon => (
 			<link rel="icon"
@@ -393,6 +393,8 @@ function scrollFunction() {
 		if (displayMode === 'overlay' || displayMode === 'none' ||
 			(displayMode === 'fullscreen' && document.documentElement.dataset.previewLayout === 'hero')) overBanner = false;
 	}
+	// Only fullscreen entrances conceal navigation. Banner mode stays navigable at every scroll position.
+	if (displayMode === 'banner' || displayMode === 'overlay' || displayMode === 'none') overBanner = false;
 	document.body.dataset.bannerScrolled = String(!overBanner);
 	const navigationWrapper = document.getElementById('navbar-wrapper');
 	navigationWrapper?.toggleAttribute('inert', isHome && overBanner);

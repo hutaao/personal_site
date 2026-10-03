@@ -12,7 +12,7 @@ import { withUserConfig } from "../utils/config-overlay.ts";
 export const siteConfig: SiteConfig = withUserConfig("site", {
 	site: "https://hutaao.github.io/personal_site/",
 	base: "/personal_site/",
-	title: "hutaao 的学习手记",
+	title: "hutaao",
 	subtitle: "把好奇心，写成看得见的路径。",
 	// 电脑端顶栏标题与导航内容区域："left" 左对齐，"center" 居中。
 	topAppBar: {
@@ -70,8 +70,8 @@ export const siteConfig: SiteConfig = withUserConfig("site", {
 		homeText: {
 			// 仅在首页 Banner 中显示，标题与副标题会上下居中排列。
 			enable: true,
-			title: "hutaao 的学习手记",
-			subtitle: ["把好奇心，写成看得见的路径。"],
+			title: "welcome to my blog!",
+			subtitle: ["四百年，不过是明日复明日罢了"],
 			typewriter: {
 				// 副标题逐字显示；关闭后直接显示完整副标题。
 				enable: true,
@@ -115,7 +115,7 @@ export const siteConfig: SiteConfig = withUserConfig("site", {
 	},
 	favicon: [
 		// 浏览器标签页图标，路径相对于 public 目录。
-		{ src: "/logo/icon.webp" },
+		{ src: "/favicon/hutaao-monogram.svg", sizes: "any" },
 	],
 });
 

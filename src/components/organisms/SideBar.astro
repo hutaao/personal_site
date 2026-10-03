@@ -22,6 +22,7 @@ import { i18n } from "@i18n/translation";
 import { isWidgetVisibleOnPage, pagesToAttribute } from "@utils/sidebar-page";
 import { musicConfig, resolveMusicOptions } from "@/config/musicConfig";
 import { sidebarConfig } from "@/config/sidebarConfig";
+import { momentsConfig } from "@/config/momentsConfig";
 import type {
 	SidebarColumn,
 	SidebarPage,
@@ -66,6 +67,14 @@ const MusicSidebar =
 		? (await import("virtual:shirone-music-sidebar")).default
 		: null;
 
+// 可选 SSR widget 在开关判定后才导入，关闭时不加载组件或样式。
+const hasWidget = (type: SidebarWidget["type"]) =>
+	sidebarConfig.enable && sidebarConfig.components.some((widget) => widget.type === type && widget.enable);
+const MomentsSidebar = momentsConfig.enable && hasWidget("moments")
+	? (await import("@components/organisms/MomentsSidebar.astro")).default : null;
+const SiteInfo = hasWidget("siteInfo")
+	? (await import("@components/organisms/SiteInfo.astro")).default : null;
+
 // widget 类型 → 组件（键必须覆盖 SidebarWidget 的全部 type）
 const componentMap = {
 	profile: Profile,
@@ -77,6 +86,8 @@ const componentMap = {
 	calendar: Calendar,
 	toc: SidebarTOC,
 	music: MusicSidebar,
+	moments: MomentsSidebar,
+	siteInfo: SiteInfo,
 } satisfies Record<SidebarWidget["type"], unknown>;
 
 type WidgetRenderer = (props: Record<string, unknown>) => unknown;
@@ -88,6 +99,8 @@ const widgets = sidebarConfig.enable
 			(widget) =>
 				widget.enable &&
 				(widget.column ?? "primary") === column &&
+				(widget.type !== "moments" || MomentsSidebar !== null) &&
+				(widget.type !== "siteInfo" || SiteInfo !== null) &&
 				(widget.type !== "music" || MusicSidebar !== null),
 		)
 	: [];

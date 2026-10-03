@@ -56,6 +56,12 @@ export const LinkPresets: Record<string, NavBarLink> = {
 		icon: "material-symbols:auto-awesome-outline-rounded",
 		pageKey: "moments",
 	},
+	Guestbook: {
+		name: i18n(I18nKey.guestbook),
+		url: "/guestbook/",
+		icon: "material-symbols:chat-outline-rounded",
+		pageKey: "guestbook",
+	},
 	Anime: {
 		name: i18n(I18nKey.anime),
 		url: "/anime/",
@@ -130,7 +136,7 @@ export const LinkPresets: Record<string, NavBarLink> = {
 	},
 	GitHub: {
 		name: "GitHub",
-		url: "https://github.com/LyraVoid/Shirone",
+		url: "https://github.com/hutaao",
 		icon: "fa6-brands:github",
 		external: true,
 		pageKey: "github",
@@ -141,9 +147,12 @@ const defaultNavBarConfig: NavBarConfig = {
 	links: [
 		LinkPresets.Home,
 		LinkPresets.Archive,
-		LinkPresets.Friends,
+		{
+			name: i18n(I18nKey.social),
+			icon: "material-symbols:group-outline-rounded",
+			children: [LinkPresets.Friends, LinkPresets.Guestbook],
+		},
 		LinkPresets.Moments,
-		LinkPresets.Anime,
 		LinkPresets.Compass,
 		LinkPresets.Albums,
 		{
@@ -152,8 +161,6 @@ const defaultNavBarConfig: NavBarConfig = {
 			children: [
 				LinkPresets.Timeline,
 				LinkPresets.Projects,
-				LinkPresets.Devices,
-				LinkPresets.Games,
 				LinkPresets.Skills,
 				// 分类/标签入口不进导航菜单（避免菜单项过多），预设已登记指向独立页面，
 				// 需要时取消注释即可

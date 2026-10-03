@@ -31,6 +31,7 @@ export type SidebarPage =
 	| "home" // 首页（[...page].astro 及其分页）
 	| "archive" // 归档
 	| "friends" // 友链
+	| "guestbook" // 留言
 	| "moments" // 动态
 	| "anime" // 番剧收藏
 	| "compass" // 站点罗盘
@@ -126,6 +127,26 @@ export interface CalendarWidget {
 	startOfWeek?: "mon" | "sun";
 }
 
+/** 最新动态摘要，置顶优先，条目链接到动态页锚点。 */
+export interface MomentsWidget {
+	type: "moments";
+	enable: boolean;
+	slot: SidebarWidgetSlot;
+	column?: SidebarColumn;
+	pages?: SidebarPage[];
+	/** 摘要数量，默认 3。 */
+	limit?: number;
+}
+
+/** 站点真实配置与构建环境信息，无流量统计或外部请求。 */
+export interface SiteInfoWidget {
+	type: "siteInfo";
+	enable: boolean;
+	slot: SidebarWidgetSlot;
+	column?: SidebarColumn;
+	pages?: SidebarPage[];
+}
+
 /** 文章目录（仅文章详情页显示） */
 export interface TocWidget {
 	type: "toc";
@@ -153,6 +174,8 @@ export type SidebarWidget =
 	| AnnouncementWidget
 	| StatsWidget
 	| CalendarWidget
+	| MomentsWidget
+	| SiteInfoWidget
 	| TocWidget
 	| MusicWidget;
 

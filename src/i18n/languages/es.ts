@@ -2,6 +2,37 @@ import Key from "../i18nKey-runtime.mjs";
 import type { Translation } from "../translation.ts";
 
 export const es: Translation = {
+	[Key.social]: "Social",
+	[Key.guestbook]: "Libro de visitas",
+	[Key.guestbookDescription]:
+		"Deja tu huella y comparte tus ideas o sugerencias.",
+	[Key.guestbookFriendly]: "Mantén una conversación amable y respetuosa.",
+	[Key.guestbookSuggestions]:
+		"Comparte tus ideas o sugerencias para mejorar este sitio.",
+	[Key.guestbookThanks]:
+		"Gracias por tu visita. Cada mensaje inicia una conversación.",
+	[Key.guestbookUnavailable]: "Los mensajes aún no están disponibles",
+	[Key.guestbookUnavailableHint]:
+		"Estamos preparando el libro de visitas. Salúdanos cuando abra.",
+	[Key.momentsViewAll]: "Ver todos los momentos",
+	[Key.momentsImageUpdate]: "Actualización de imágenes",
+	[Key.siteInfo]: "Información del sitio",
+	[Key.siteInfoPlatform]: "Alojamiento",
+	[Key.siteInfoTheme]: "Tema",
+	[Key.siteInfoLicense]: "Licencia del contenido",
+	[Key.siteInfoAddress]: "Dirección del sitio",
+	[Key.siteInfoFramework]: "Versión de Astro",
+	[Key.siteInfoNode]: "Versión de Node.js",
+	[Key.siteInfoBuilt]: "Fecha de compilación",
+	[Key.siteInfoExpand]: "Mostrar más información",
+	[Key.siteInfoCollapse]: "Mostrar menos información",
+	[Key.calendarActivity]: "Actividad de actualización",
+	[Key.calendarActivityHint]:
+		"Artículos, cambios y momentos de los últimos {days} días",
+	[Key.calendarActivityDay]: "{date}: {count} actualizaciones",
+	[Key.calendarActivityLess]: "Menos",
+	[Key.calendarActivityMore]: "Más",
+	[Key.calendarActivityEntries]: "{count} actualizaciones",
 	[Key.home]: "Inicio",
 	[Key.about]: "Sobre mí",
 	[Key.archive]: "Archivo",

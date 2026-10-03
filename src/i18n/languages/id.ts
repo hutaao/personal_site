@@ -2,6 +2,38 @@ import Key from "../i18nKey-runtime.mjs";
 import type { Translation } from "../translation.ts";
 
 export const id: Translation = {
+	[Key.social]: "Sosial",
+	[Key.guestbook]: "Buku tamu",
+	[Key.guestbookDescription]:
+		"Tinggalkan jejak dan bagikan pendapat atau saranmu.",
+	[Key.guestbookFriendly]:
+		"Jaga percakapan tetap ramah dan saling menghormati.",
+	[Key.guestbookSuggestions]:
+		"Bagikan ide atau saran untuk memperbaiki situs ini.",
+	[Key.guestbookThanks]:
+		"Terima kasih telah berkunjung. Setiap pesan memulai percakapan.",
+	[Key.guestbookUnavailable]: "Pesan belum dibuka",
+	[Key.guestbookUnavailableHint]:
+		"Buku tamu sedang disiapkan. Mari menyapa setelah dibuka.",
+	[Key.momentsViewAll]: "Lihat semua momen",
+	[Key.momentsImageUpdate]: "Pembaruan gambar",
+	[Key.siteInfo]: "Informasi situs",
+	[Key.siteInfoPlatform]: "Hosting",
+	[Key.siteInfoTheme]: "Tema",
+	[Key.siteInfoLicense]: "Lisensi konten",
+	[Key.siteInfoAddress]: "Alamat situs",
+	[Key.siteInfoFramework]: "Versi Astro",
+	[Key.siteInfoNode]: "Versi Node.js",
+	[Key.siteInfoBuilt]: "Waktu build",
+	[Key.siteInfoExpand]: "Tampilkan informasi lainnya",
+	[Key.siteInfoCollapse]: "Sembunyikan informasi",
+	[Key.calendarActivity]: "Aktivitas pembaruan",
+	[Key.calendarActivityHint]:
+		"Artikel, suntingan, dan momen dalam {days} hari terakhir",
+	[Key.calendarActivityDay]: "{date}: {count} pembaruan",
+	[Key.calendarActivityLess]: "Sedikit",
+	[Key.calendarActivityMore]: "Banyak",
+	[Key.calendarActivityEntries]: "{count} pembaruan",
 	[Key.home]: "Beranda",
 	[Key.about]: "Tentang",
 	[Key.archive]: "Arsip",

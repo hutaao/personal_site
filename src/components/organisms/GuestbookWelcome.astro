@@ -1,0 +1,31 @@
+---
+import Card from "@components/atoms/display/Card.svelte";
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+import { Icon } from "astro-icon/components";
+---
+
+<Card color="var(--card-bg)" radius="l" class="guestbook-welcome p-6 md:p-8 mb-4">
+  <div class="guestbook-welcome__heading">
+    <span class="guestbook-welcome__icon" aria-hidden="true"><Icon name="material-symbols:chat-rounded" /></span>
+    <div>
+      <h1>{i18n(I18nKey.guestbook)}</h1>
+      <p>{i18n(I18nKey.guestbookDescription)}</p>
+    </div>
+  </div>
+  <ul>
+    <li>{i18n(I18nKey.guestbookFriendly)}</li>
+    <li>{i18n(I18nKey.guestbookSuggestions)}</li>
+    <li>{i18n(I18nKey.guestbookThanks)}</li>
+  </ul>
+</Card>
+
+<style>
+  .guestbook-welcome__heading { display:flex; align-items:center; gap:var(--m3e-space-4); }
+  .guestbook-welcome__icon { display:grid; place-items:center; flex-shrink:0; width:3.5rem; height:3.5rem; background:var(--primary-container); color:var(--on-primary-container); border-radius:var(--shape-corner-l); font-size:2rem; }
+  h1 { margin:0 0 var(--m3e-space-1); font:var(--m3e-type-headline-small); font-weight:700; color:var(--on-surface); }
+  p { margin:0; font:var(--m3e-type-body-medium); color:var(--on-surface-variant); }
+  ul { list-style:disc; margin:var(--m3e-space-6) 0 0; padding-left:var(--m3e-space-6); color:var(--on-surface-variant); font:var(--m3e-type-body-large); }
+  li { padding-left:var(--m3e-space-1); margin-top:var(--m3e-space-3); }
+  li::marker { color:var(--primary); }
+</style>

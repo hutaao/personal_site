@@ -16,33 +16,7 @@ export const timelineConfig: TimelineConfig = withUserConfig("timeline", {
 	enable: true,
 	title: "$t:timeline",
 	description: "$t:timelineBanner",
-	categories: [
-		{
-			key: "milestone",
-			label: "Milestones",
-			icon: "material-symbols:flag-rounded",
-		},
-		{
-			key: "project",
-			label: "Projects",
-			icon: "material-symbols:code-rounded",
-		},
-		{
-			key: "career",
-			label: "Career",
-			icon: "material-symbols:work-rounded",
-		},
-		{
-			key: "education",
-			label: "Education",
-			icon: "material-symbols:school-rounded",
-		},
-		{
-			key: "life",
-			label: "Life",
-			icon: "material-symbols:favorite-rounded",
-		},
-	],
+	categories: [],
 	order: "desc",
 	// disabledTitles: [],
 });

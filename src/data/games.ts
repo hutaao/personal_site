@@ -12,40 +12,4 @@
  */
 import type { GameItem } from "@/types/gamesConfig";
 
-export const gamesData: GameItem[] = [
-	{
-		id: "nte-neverness-to-everness",
-		name: "NTE: Neverness to Everness",
-		developer: "Hotta Studio",
-		category: "open-world",
-		status: "playing",
-		cover: "assets/games/yihuan-hero.jpg",
-		icon: "material-symbols:explore-outline-rounded",
-		rating: 4.5,
-		hours: 86,
-		platform: "PC",
-		year: "2026",
-		tags: ["Open World", "Urban", "Supernatural"],
-		description:
-			"A supernatural urban open-world RPG. As an anomaly-user who senses the “waves” of people and anomalies, you join E.T.D Squad Six and investigate the city's paranormal events.",
-		link: "https://yh.wanmei.com/main.html",
-		featured: true,
-	},
-	{
-		id: "minecraft",
-		name: "Minecraft",
-		developer: "Mojang Studios",
-		category: "sandbox",
-		status: "playing",
-		cover: "assets/games/minecraft-hero.jpg",
-		icon: "material-symbols:widgets-rounded",
-		rating: 5,
-		hours: 420,
-		platform: "PC",
-		year: "2011",
-		tags: ["Sandbox", "Survival", "Building"],
-		description:
-			"A blocky sandbox where you mine, craft and build across procedurally generated worlds. Survive the night, or just keep building — alone or with friends.",
-		link: "https://www.minecraft.net/",
-	},
-];
+export const gamesData: GameItem[] = [];

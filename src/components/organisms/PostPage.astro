@@ -1,5 +1,9 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import Card from "@components/atoms/display/Card.svelte";
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+import { profileConfig, siteConfig } from "@/config";
 import { getPostUrl } from "@utils/url-utils";
 import { POST_CARD_MIN_WIDTH, postListConfig } from "@/config/postListConfig";
 import PostCard from "./PostCard.astro";
@@ -16,6 +20,13 @@ const { mode, cover, cardWidth } = postListConfig.layout;
      容器承载布局模式：m3e-post-list--list / --grid（PostCard 原子经
      :global 祖先钩子联动形态），--cover-left 仅 list 模式生效。 -->
 <div class:list={["m3e-post-list-shell", `m3e-post-list-shell--${cardWidth}`]}>
+    {page.data.length === 0 && (
+        <Card color="var(--card-bg)" radius="l" class="p-6 md:p-8 mb-4">
+            <h1 class="text-2xl font-bold text-[var(--on-surface)]">{siteConfig.title}</h1>
+            <p class="mt-3 text-[var(--on-surface-variant)]">{profileConfig.bio}</p>
+            <p class="mt-6 text-[var(--on-surface-variant)]">0 {i18n(I18nKey.postsCount)}</p>
+        </Card>
+    )}
     <div
         id="post-list"
         class:list={[

@@ -2,6 +2,37 @@ import Key from "../i18nKey-runtime.mjs";
 import type { Translation } from "../translation.ts";
 
 export const tr: Translation = {
+	[Key.social]: "Sosyal",
+	[Key.guestbook]: "Ziyaretçi defteri",
+	[Key.guestbookDescription]:
+		"Bir iz bırak ve düşüncelerini veya önerilerini paylaş.",
+	[Key.guestbookFriendly]: "Konuşmayı nazik ve saygılı tut.",
+	[Key.guestbookSuggestions]:
+		"Fikirlerini veya siteyi geliştirmek için önerilerini paylaş.",
+	[Key.guestbookThanks]:
+		"Ziyaretin için teşekkürler. Her mesaj bir sohbet başlatır.",
+	[Key.guestbookUnavailable]: "Mesajlar henüz açık değil",
+	[Key.guestbookUnavailableHint]:
+		"Ziyaretçi defteri hazırlanıyor. Açıldığında merhaba de.",
+	[Key.momentsViewAll]: "Tüm anları görüntüle",
+	[Key.momentsImageUpdate]: "Görsel güncellemesi",
+	[Key.siteInfo]: "Site bilgileri",
+	[Key.siteInfoPlatform]: "Barındırma",
+	[Key.siteInfoTheme]: "Tema",
+	[Key.siteInfoLicense]: "İçerik lisansı",
+	[Key.siteInfoAddress]: "Site adresi",
+	[Key.siteInfoFramework]: "Astro sürümü",
+	[Key.siteInfoNode]: "Node.js sürümü",
+	[Key.siteInfoBuilt]: "Derleme zamanı",
+	[Key.siteInfoExpand]: "Daha fazla bilgi göster",
+	[Key.siteInfoCollapse]: "Bilgileri daralt",
+	[Key.calendarActivity]: "Güncelleme etkinliği",
+	[Key.calendarActivityHint]:
+		"Son {days} gündeki yazılar, düzenlemeler ve anlar",
+	[Key.calendarActivityDay]: "{date}: {count} güncelleme",
+	[Key.calendarActivityLess]: "Az",
+	[Key.calendarActivityMore]: "Çok",
+	[Key.calendarActivityEntries]: "{count} güncelleme",
 	[Key.home]: "Anasayfa",
 	[Key.about]: "Hakkında",
 	[Key.archive]: "Arşiv",

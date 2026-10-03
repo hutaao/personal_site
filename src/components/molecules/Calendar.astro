@@ -2,13 +2,14 @@
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import { getCalendarData } from "@utils/calendar-data";
+import { formatInstantDateInSiteTimeZone } from "@utils/content-date";
 import { siteConfig } from "@/config/siteConfig";
 import type { CalendarWidget } from "@/types/sidebarConfig";
 /**
- * 月度文章历侧栏 widget（数据驱动）。
+ * 月度更新日历与贡献图侧栏 widget（数据驱动）。
  * wrapper 只负责取数 + i18n 外壳；交互视图在 CalendarView.svelte
  * （client:visible 惰性水合）。数据 SSR 直出——侧栏静态渲染在 Swup
- * 容器外，不从 API 端点拉取；日期口径与文章卡片一致（date-utils）。
+ * 容器外，不从 API 端点拉取；文章使用日历日期，动态使用站点时区。
  */
 import CalendarView from "./CalendarView.svelte";
 import WidgetLayout from "./WidgetLayout.astro";
@@ -37,8 +38,16 @@ const { postsByDate, activeMonths } = await getCalendarData();
 		{startOfWeek}
 		{postsByDate}
 		{activeMonths}
+		todayKey={formatInstantDateInSiteTimeZone(new Date())}
+		timeZone={siteConfig.timeZone}
 		backTodayLabel={i18n(I18nKey.calendarBackToday)}
 		prevMonthLabel={i18n(I18nKey.calendarPrevMonth)}
 		nextMonthLabel={i18n(I18nKey.calendarNextMonth)}
+		activityLabel={i18n(I18nKey.calendarActivity)}
+		activityHint={i18n(I18nKey.calendarActivityHint)}
+		activityDayLabel={i18n(I18nKey.calendarActivityDay)}
+		activityLessLabel={i18n(I18nKey.calendarActivityLess)}
+		activityMoreLabel={i18n(I18nKey.calendarActivityMore)}
+		activityEntriesLabel={i18n(I18nKey.calendarActivityEntries)}
 	/>
 </WidgetLayout>
