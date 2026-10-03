@@ -1,7 +1,7 @@
 ---
 /**
  * 页脚（消费 blog/FooterBar 原子）。
- * 只负责配置数据：版权名称/年份、RSS/Atom/Sitemap 链接、Powered by、FooterConfig.html 文件注入。
+ * 只负责配置数据：版权名称/年份、RSS/Atom 链接、Powered by、FooterConfig.html 文件注入。
  */
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -14,7 +14,6 @@ const currentYear = new Date().getFullYear();
 const links = [
 	{ label: "RSS", href: url("rss/") },
 	{ label: "Atom", href: url("atom/") },
-	{ label: "Sitemap", href: url("sitemap-index.xml"), external: true },
 ];
 const isShironesPackage = packageMetadata.name === "shirones";
 const poweredBy = [
@@ -64,7 +63,7 @@ if (footerConfig.enable) {
 	links={links}
 	poweredBy={poweredBy}
 	version={packageMetadata.version}
-	versionHref={isShironesPackage ? "https://www.npmjs.com/package/shirones" : "https://github.com/LyraVoid/Shirone"}
+	versionLabel="主题版本"
 	customHtml={customFooterHtml}
 	contentLicense={licenseConfig.enable ? { label: licenseConfig.name, href: licenseConfig.url } : undefined}
 />

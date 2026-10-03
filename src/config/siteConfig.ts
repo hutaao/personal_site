@@ -52,6 +52,9 @@ export const siteConfig: SiteConfig = withUserConfig("site", {
 		allowMotion: true, // 是否允许背景微动效（开启 reduced-motion 时自动静止）
 	},
 	banner: {
+		// 点击播放后才加载；pause 表示播完暂停，下次点击播放下一项；continue 表示自动连播。
+		// 本地素材放在 public/videos，再填写 "/videos/文件名.mp4"。暂无视频时保留空数组。
+		video: { sources: [], order: "sequential", endBehavior: "pause" },
 		// 推荐将图片放入 src/assets，并填写相对 src 的路径，以启用构建期 AVIF/WebP 响应式优化。
 		// 以 "/" 开头的 public 路径与远程 URL 仍可用，但会保留原图、不生成候选。
 		// desktop 用于 >= 1024px；mobile 仅用于 < 1024px 的首页，手机非首页不显示壁纸。

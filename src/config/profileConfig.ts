@@ -15,5 +15,10 @@ export const profileConfig: ProfileConfig = withUserConfig("profile", {
 			icon: "fa6-brands:github",
 			url: "https://github.com/hutaao",
 		},
+		{
+			name: "Email",
+			icon: "material-symbols:mail-outline-rounded",
+			url: "mailto:hutaao1064@gmail.com",
+		},
 	],
 });

@@ -2,6 +2,7 @@
 import { Image } from "astro:assets";
 import { Icon } from "astro-icon/components";
 import BannerWaves from "@components/molecules/BannerWaves.astro";
+import BackgroundVideoButton from "@components/molecules/BackgroundVideoButton.astro";
 import fireflyDark from "@/assets/images/firefly/firefly-dark.png";
 import fireflyLight from "@/assets/images/firefly/firefly-light.png";
 import background from "@/assets/images/hutaao/background.png";
@@ -16,6 +17,7 @@ const links = [
 	{ name: "关于", icon: "material-symbols:info-rounded", href: url("/about/"), menu: true },
 	{ name: "链接", icon: "material-symbols:link-rounded", href: "https://github.com/hutaao", external: true, menu: true },
 ];
+const videoSources = (siteConfig.banner.video?.sources ?? []).filter((source) => source.trim()).map((source) => /^https?:\/\//.test(source) ? source : url(source));
 ---
 
 <!--
@@ -33,7 +35,9 @@ const links = [
 		fetchpriority="high"
 		quality={85}
 	/>
+	<video class="firefly-entrance__video" data-banner-video data-video-sources={JSON.stringify(videoSources)} data-video-order={siteConfig.banner.video?.order ?? "sequential"} data-video-end={siteConfig.banner.video?.endBehavior ?? "pause"} muted playsinline preload="none" aria-hidden="true"></video>
 	<div class="firefly-entrance__dim" aria-hidden="true"></div>
+	<div class="firefly-entrance__video-control"><BackgroundVideoButton id="entrance-video-toggle" /></div>
 	<div class="firefly-entrance__waves" aria-hidden="true">
 		<BannerWaves idPrefix="firefly-banner" />
 	</div>
@@ -96,6 +100,7 @@ const links = [
 </section>
 
 <script>
+	import { bindEntranceVideo } from "@utils/entrance-video";
 	function bindFireflyEntrance() {
 		const entrance = document.getElementById("firefly-entrance");
 		if (!entrance || entrance.dataset.bound === "true") return;
@@ -128,5 +133,6 @@ const links = [
 	}
 
 	bindFireflyEntrance();
+	bindEntranceVideo();
 	document.addEventListener("swup:page:view", bindFireflyEntrance);
 </script>

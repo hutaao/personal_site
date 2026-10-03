@@ -84,12 +84,12 @@ if (typeof avatarAsset !== "string") {
         <div class="m3-profile__links flex flex-wrap gap-2 justify-center mb-1">
             {config.links.length > 1 && config.links.map(item =>
                 <Tooltip label={item.name} placement="top" client:load>
-                    <IconButton href={item.url} target="_blank" rel="me" label={item.name}>
+                    <IconButton href={item.url} target={item.url.startsWith("mailto:") ? undefined : "_blank"} rel="me" label={item.name}>
                         <Icon name={item.icon} class="text-[1.5rem]"></Icon>
                     </IconButton>
                 </Tooltip>
             )}
-            {config.links.length == 1 && <Button href={config.links[0].url} target="_blank" ariaLabel={config.links[0].name}
+            {config.links.length == 1 && <Button href={config.links[0].url} target={config.links[0].url.startsWith("mailto:") ? undefined : "_blank"} ariaLabel={config.links[0].name}
                                                  variant="text" size="small" class="!px-3 !font-bold !text-[var(--on-surface)]">
                 <Icon name={config.links[0].icon} class="text-[1.5rem]"></Icon>
                 {config.links[0].name}

@@ -60,6 +60,37 @@ body[data-current-page="home"] .firefly-entrance {
 	background: rgb(0 0 0 / 20%);
 }
 
+.firefly-entrance__video {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 1200ms cubic-bezier(.2, 0, 0, 1);
+}
+.firefly-entrance__video--active { opacity: 1; }
+.firefly-entrance__video-control {
+	display: none;
+	position: absolute;
+	z-index: 4;
+	top: .75rem;
+	right: max(1rem, calc((100vw - var(--page-width)) / 2 + 1rem));
+	pointer-events: auto;
+	color: white;
+}
+.firefly-entrance__video-control .background-video-toggle { color: white; }
+html[data-preview-mode="fullscreen"] body[data-current-page="home"]:not([data-banner-scrolled="true"]) .firefly-entrance__video-control { display: block; }
+html[data-preview-mode="fullscreen"][data-preview-layout="hero"] .firefly-entrance__video {
+	filter: blur(calc(var(--wallpaper-blur) * var(--firefly-blur-progress, 1)));
+	transform: scale(1.04);
+}
+html[data-preview-mode="fullscreen"][data-preview-layout="hero"] body:not([data-current-page="home"]) .firefly-entrance__video { filter: blur(var(--wallpaper-blur)); }
+html.motion-reduced .firefly-entrance__video { transition: none; }
+@media (prefers-reduced-motion: reduce) { .firefly-entrance__video { transition: none; } }
+
 /* The image and all entrance content leave together in normal page scrolling. */
 .firefly-entrance::after {
 	content: "";

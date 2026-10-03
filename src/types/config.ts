@@ -30,6 +30,8 @@ export type BannerThemeSource = {
 export type BannerSourceValue = string[] | BannerThemeSource;
 
 export type BannerConfig = {
+	/** 手动播放的背景视频，空源时按钮点击无动作。路径相对 public，或使用 HTTPS 直链。 */
+	video?: { sources: string[]; order: "sequential" | "random"; endBehavior?: "pause" | "continue" };
 	src: {
 		desktop: BannerSourceValue;
 		mobile: BannerSourceValue;
