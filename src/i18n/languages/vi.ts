@@ -2,6 +2,37 @@ import Key from "../i18nKey-runtime.mjs";
 import type { Translation } from "../translation.ts";
 
 export const vi: Translation = {
+	[Key.social]: "Giao lưu",
+	[Key.guestbook]: "Sổ lưu bút",
+	[Key.guestbookDescription]:
+		"Để lại dấu chân và chia sẻ suy nghĩ hoặc góp ý của bạn.",
+	[Key.guestbookFriendly]: "Hãy trò chuyện thân thiện và tôn trọng nhau.",
+	[Key.guestbookSuggestions]:
+		"Chia sẻ ý tưởng hoặc đề xuất cải thiện trang web.",
+	[Key.guestbookThanks]:
+		"Cảm ơn bạn đã ghé thăm. Mỗi tin nhắn mở đầu một cuộc trò chuyện.",
+	[Key.guestbookUnavailable]: "Chưa mở nhận lời nhắn",
+	[Key.guestbookUnavailableHint]:
+		"Sổ lưu bút đang được chuẩn bị. Hãy chào hỏi khi mở nhé.",
+	[Key.momentsViewAll]: "Xem tất cả khoảnh khắc",
+	[Key.momentsImageUpdate]: "Cập nhật hình ảnh",
+	[Key.siteInfo]: "Thông tin trang web",
+	[Key.siteInfoPlatform]: "Nền tảng lưu trữ",
+	[Key.siteInfoTheme]: "Giao diện",
+	[Key.siteInfoLicense]: "Giấy phép nội dung",
+	[Key.siteInfoAddress]: "Địa chỉ trang web",
+	[Key.siteInfoFramework]: "Phiên bản Astro",
+	[Key.siteInfoNode]: "Phiên bản Node.js",
+	[Key.siteInfoBuilt]: "Thời gian dựng",
+	[Key.siteInfoExpand]: "Hiện thêm thông tin",
+	[Key.siteInfoCollapse]: "Thu gọn thông tin",
+	[Key.calendarActivity]: "Hoạt động cập nhật",
+	[Key.calendarActivityHint]:
+		"Bài viết, chỉnh sửa và khoảnh khắc trong {days} ngày qua",
+	[Key.calendarActivityDay]: "{date}: {count} cập nhật",
+	[Key.calendarActivityLess]: "Ít",
+	[Key.calendarActivityMore]: "Nhiều",
+	[Key.calendarActivityEntries]: "{count} cập nhật",
 	[Key.home]: "Trang chủ",
 	[Key.about]: "Giới thiệu",
 	[Key.archive]: "Kho bài",

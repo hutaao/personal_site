@@ -1,0 +1,32 @@
+---
+import Card from "@components/atoms/display/Card.svelte";
+import GuestbookWelcome from "@components/organisms/GuestbookWelcome.astro";
+import CommentSection from "@components/organisms/comment/CommentSection.astro";
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { commentConfig, resolveCommentOptions, siteConfig } from "@/config";
+import { url } from "@utils/url-utils";
+const title = i18n(I18nKey.guestbook);
+const options = resolveCommentOptions(commentConfig);
+---
+
+<MainGridLayout title={title} description={i18n(I18nKey.guestbookDescription)} page="guestbook" hasComments={Boolean(options)}>
+  <GuestbookWelcome />
+  {options ? <CommentSection context={{ key: "page:guestbook", path: url("/guestbook/"), title, language: siteConfig.lang }} /> : (
+    <Card color="var(--card-bg)" radius="l" class="guestbook-comments p-6 md:p-8 mb-4">
+      <h2>{i18n(I18nKey.comments)}</h2>
+      <div class="guestbook-comments__empty">
+        <p class="guestbook-comments__status">{i18n(I18nKey.guestbookUnavailable)}</p>
+        <p>{i18n(I18nKey.guestbookUnavailableHint)}</p>
+      </div>
+    </Card>
+  )}
+</MainGridLayout>
+
+<style>
+  h2 { margin:0; padding-left:var(--m3e-space-3); border-left:3px solid var(--primary); color:var(--on-surface); font:var(--m3e-type-title-large); font-weight:700; }
+  .guestbook-comments__empty { margin-top:var(--m3e-space-6); padding:var(--m3e-space-6); border-radius:var(--shape-corner-l); background:var(--surface-container-low); text-align:center; }
+  p { margin:var(--m3e-space-2) 0 0; color:var(--on-surface-variant); font:var(--m3e-type-body-medium); }
+  .guestbook-comments__status { margin-top:0; color:var(--on-surface); font:var(--m3e-type-title-medium); }
+</style>

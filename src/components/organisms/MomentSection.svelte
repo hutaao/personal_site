@@ -18,7 +18,7 @@ import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import type { MomentItem } from "@utils/content-utils";
 import { initFancybox } from "@utils/fancybox-handler";
-import { onMount } from "svelte";
+import { onMount, tick } from "svelte";
 
 let {
 	moments = [] as MomentItem[],
@@ -75,6 +75,25 @@ const filtered = $derived.by(() => {
 const visibleMoments = $derived(filtered.slice(0, shownCount));
 const hasMore = $derived(filtered.length > shownCount);
 
+function hashMomentId(): string | null {
+	try {
+		const hash = decodeURIComponent(window.location.hash);
+		return hash.startsWith("#moment-") ? hash.slice(8) : null;
+	} catch {
+		return null;
+	}
+}
+
+async function revealHashMoment() {
+	const id = hashMomentId();
+	if (!id) return;
+	const index = filtered.findIndex((moment) => moment.id === id);
+	if (index < 0) return;
+	shownCount = Math.max(shownCount, index + 1);
+	await tick();
+	document.getElementById(`moment-${id}`)?.scrollIntoView({ block: "start" });
+}
+
 function countLabel(count: number) {
 	return `${count} ${i18n(I18nKey.momentsCounts)}`;
 }
@@ -94,7 +113,8 @@ $effect(() => {
 	const q = query;
 	const t = selectedTag;
 	if (!initialized) return;
-	shownCount = MOMENTS_PAGE_SIZE;
+	const target = filtered.findIndex((moment) => moment.id === hashMomentId());
+	shownCount = Math.max(MOMENTS_PAGE_SIZE, target + 1);
 });
 
 // 筛选状态同步到 URL（?q= / ?tag=），刷新/分享/回退保留
@@ -111,7 +131,7 @@ $effect(() => {
 	history.replaceState(
 		history.state,
 		"",
-		qs ? `?${qs}` : window.location.pathname,
+		`${window.location.pathname}${qs ? `?${qs}` : ""}${window.location.hash}`,
 	);
 });
 
@@ -122,7 +142,13 @@ onMount(() => {
 	initialized = true;
 	// 图片灯箱：client:only 岛挂载晚于全局 init，此处确保 [data-fancybox] 已绑定
 	initFancybox();
-	return () => phaseTimers.forEach(clearTimeout);
+	void revealHashMoment();
+	const onHashChange = () => void revealHashMoment();
+	window.addEventListener("hashchange", onHashChange);
+	return () => {
+		phaseTimers.forEach(clearTimeout);
+		window.removeEventListener("hashchange", onHashChange);
+	};
 });
 </script>
 

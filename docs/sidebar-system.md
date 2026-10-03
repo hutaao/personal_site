@@ -189,6 +189,8 @@ export const sidebarConfig: SidebarConfig = {
 | `announcement` | `Announcement` | `announcementConfig` | 无（Banner round） | — |
 | `stats` | `SiteStats` | `getSiteStats` | `WidgetLayout` | — |
 | `calendar` | `Calendar` | `getCalendarData` | `WidgetLayout` | `startOfWeek?`（默认 `"mon"`） |
+| `moments` | `MomentsSidebar`（organisms） | `getSortedMoments` | `WidgetLayout` | `limit?`（默认 3；1–10） |
+| `siteInfo` | `SiteInfo`（organisms） | 实际站点配置与构建环境 | `WidgetLayout` | — |
 | `music` | `MusicSidebar`（organisms） | `musicConfig` | `WidgetLayout` | —（内容与初始状态来自全局配置） |
 | `toc` | `SidebarTOC` | 当前文章 headings | `WidgetLayout` | —（通常限定 `pages: ["post"]`） |
 

@@ -8,7 +8,9 @@
  */
 import IconButton from "@components/atoms/action/IconButton.svelte";
 import type { CalendarPost } from "@utils/calendar-data";
+import { activityLevel, buildActivityDays } from "@utils/calendar-activity";
 import { collapse, reveal } from "@utils/motion";
+import { onMount, tick } from "svelte";
 
 interface Props {
 	/** BCP47 locale（由 siteConfig.lang 换算，Intl 用） */
@@ -21,6 +23,14 @@ interface Props {
 	backTodayLabel: string;
 	prevMonthLabel: string;
 	nextMonthLabel: string;
+	todayKey: string;
+	timeZone: string;
+	activityLabel: string;
+	activityHint: string;
+	activityDayLabel: string;
+	activityLessLabel: string;
+	activityMoreLabel: string;
+	activityEntriesLabel: string;
 }
 
 let {
@@ -31,12 +41,114 @@ let {
 	backTodayLabel,
 	prevMonthLabel,
 	nextMonthLabel,
+	todayKey,
+	timeZone,
+	activityLabel,
+	activityHint,
+	activityDayLabel,
+	activityLessLabel,
+	activityMoreLabel,
+	activityEntriesLabel,
 }: Props = $props();
 
-const today = new Date();
-let year = $state(today.getFullYear());
-let month = $state(today.getMonth());
+let currentDay = $state(todayKey);
+let year = $state(Number(todayKey.slice(0, 4)));
+let month = $state(Number(todayKey.slice(5, 7)) - 1);
 let selectedDate = $state<string | null>(null);
+
+// Static pages may have been built yesterday. Refresh the site-calendar day after hydration.
+onMount(() => {
+	const parts = new Intl.DateTimeFormat("en-CA", {
+		timeZone,
+		year: "numeric",
+		month: "2-digit",
+		day: "2-digit",
+	}).formatToParts(new Date());
+	const values = Object.fromEntries(
+		parts.map(({ type, value }) => [type, value]),
+	);
+	currentDay = `${values.year}-${values.month}-${values.day}`;
+	year = Number(values.year);
+	month = Number(values.month) - 1;
+});
+
+const activityDays = $derived(buildActivityDays(currentDay, startOfWeek));
+const activityDescription = $derived(
+	activityHint.replace("{days}", String(activityDays.filter(Boolean).length)),
+);
+const activityTotal = $derived(
+	activityDays.reduce(
+		(sum, date) => sum + (date ? (postsByDate[date] ?? []).length : 0),
+		0,
+	),
+);
+const activityMonths = $derived.by(() => {
+	let previous = "";
+	return Array.from({ length: 16 }, (_, column) => {
+		const date = activityDays[column * 7 + 6] ?? currentDay;
+		const key = date.slice(0, 7);
+		if (key === previous) return "";
+		previous = key;
+		return new Intl.DateTimeFormat(locale, {
+			month: "short",
+			timeZone: "UTC",
+		}).format(new Date(`${date}T00:00:00Z`));
+	});
+});
+
+let activityTip = $state<{
+	date: string;
+	count: number;
+	x: number;
+	y: number;
+	below: boolean;
+} | null>(null);
+let activityTipElement = $state<HTMLDivElement | null>(null);
+
+// One shared tooltip is portaled above the sidebar's overflow boundary.
+function activityTooltip(node: HTMLElement) {
+	document.body.appendChild(node);
+	return { destroy: () => node.remove() };
+}
+
+async function showActivityTip(
+	date: string,
+	count: number,
+	anchor: HTMLElement,
+) {
+	const rect = anchor.getBoundingClientRect();
+	const below = rect.top < 60;
+	activityTip = {
+		date,
+		count,
+		x: rect.left + rect.width / 2,
+		y: below ? rect.bottom + 8 : rect.top - 8,
+		below,
+	};
+	await tick();
+	if (!activityTipElement || activityTip?.date !== date) return;
+	const halfWidth = activityTipElement.getBoundingClientRect().width / 2;
+	activityTip.x = Math.max(
+		halfWidth + 8,
+		Math.min(activityTip.x, window.innerWidth - halfWidth - 8),
+	);
+}
+
+function hideActivityTip() {
+	activityTip = null;
+}
+
+function dayLabel(date: string, count: number) {
+	return activityDayLabel
+		.replace("{date}", date)
+		.replace("{count}", String(count));
+}
+
+function selectActivityDate(date: string) {
+	year = Number(date.slice(0, 4));
+	month = Number(date.slice(5, 7)) - 1;
+	selectedDate = selectedDate === date ? null : date;
+}
 
 const monthTitle = $derived(
 	new Intl.DateTimeFormat(locale, { year: "numeric", month: "long" }).format(
@@ -86,13 +198,11 @@ const selectedPosts = $derived(
 const listOpen = $derived(selectedPosts.length > 0);
 
 const isCurrentMonth = $derived(
-	year === today.getFullYear() && month === today.getMonth(),
+	currentDay.startsWith(`${year}-${String(month + 1).padStart(2, "0")}`),
 );
 
 function isTodayCell(cell: DayCell): boolean {
-	return (
-		cell.key === dateKey(today.getFullYear(), today.getMonth(), today.getDate())
-	);
+	return cell.key === currentDay;
 }
 
 const currentMonthKey = $derived(`${year}-${pad(month + 1)}`);
@@ -134,8 +244,8 @@ function shiftMonth(delta: number) {
 }
 
 function backToToday() {
-	year = today.getFullYear();
-	month = today.getMonth();
+	year = Number(currentDay.slice(0, 4));
+	month = Number(currentDay.slice(5, 7)) - 1;
 	selectedDate = null;
 }
 
@@ -144,6 +254,8 @@ function toggleDay(cell: DayCell) {
 	selectedDate = selectedDate === cell.key ? null : cell.key;
 }
 </script>
+
+<svelte:window onscroll={hideActivityTip} onresize={hideActivityTip} onkeydown={(event) => { if (event.key === "Escape") hideActivityTip(); }} />
 
 <div class="m3-calendar">
 	<header class="m3-calendar__bar">
@@ -194,7 +306,9 @@ function toggleDay(cell: DayCell) {
 						class={`m3-calendar__day${cell.posts.length > 0 ? " m3-calendar__day--has-posts" : ""}${isTodayCell(cell) ? " m3-calendar__day--today" : ""}${cell.key === selectedDate ? " m3-calendar__day--selected" : ""}`}
 						disabled={cell.posts.length === 0}
 						aria-current={isTodayCell(cell) ? "date" : undefined}
-						aria-label={`${cell.key}${cell.posts.length > 0 ? `，${cell.posts.length} 篇文章` : ""}`}
+						aria-label={dayLabel(cell.key, cell.posts.length)}
+						aria-expanded={cell.posts.length ? cell.key === selectedDate : undefined}
+						aria-controls={cell.posts.length ? "calendar-selected-entries" : undefined}
 						onclick={() => toggleDay(cell)}
 					>
 						{cell.day}
@@ -204,7 +318,10 @@ function toggleDay(cell: DayCell) {
 		</div>
 	{/key}
 
-	<div class="m3-calendar__panel" use:collapse={{ open: listOpen }}>
+	<div id="calendar-selected-entries" class="m3-calendar__panel" inert={!listOpen} use:collapse={{ open: listOpen }}>
+		{#if selectedDate && listOpen}
+			<p class="m3-calendar__selection">{selectedDate} · {activityEntriesLabel.replace("{count}", String(selectedPosts.length))}</p>
+		{/if}
 		<ul class="m3-calendar__posts">
 			{#each selectedPosts as post}
 				<li class="m3-calendar__post">
@@ -214,7 +331,67 @@ function toggleDay(cell: DayCell) {
 			{/each}
 		</ul>
 	</div>
+	<section class="m3-calendar__activity" aria-label={activityLabel}>
+		<p class="m3-calendar__activity-title" title={activityDescription}>{activityLabel}</p>
+		<div class="m3-calendar__activity-months" aria-hidden="true">
+			{#each activityMonths as label}<span>{label}</span>{/each}
+		</div>
+		<div class="m3-calendar__heatmap" aria-label={activityDescription} use:reveal={{ duration: 300 }}>
+			{#each activityDays as date, index (date ?? `future-${index}`)}
+				{#if date}
+					{@const count = (postsByDate[date] ?? []).length}
+					<button
+						type="button"
+						class={`m3-calendar__activity-cell${date === selectedDate ? " m3-calendar__activity-cell--selected" : ""}`}
+						data-date={date}
+						data-count={count}
+						data-level={activityLevel(count)}
+						aria-label={dayLabel(date, count)}
+						aria-describedby={activityTip?.date === date ? "calendar-activity-tooltip" : undefined}
+						aria-current={date === currentDay ? "date" : undefined}
+						aria-expanded={count ? date === selectedDate : undefined}
+						aria-controls={count ? "calendar-selected-entries" : undefined}
+						aria-disabled={!count}
+						tabindex={count ? 0 : -1}
+						onpointerenter={(event) => showActivityTip(date, count, event.currentTarget)}
+						onpointerleave={hideActivityTip}
+						onfocus={(event) => showActivityTip(date, count, event.currentTarget)}
+						onblur={hideActivityTip}
+						onclick={() => { hideActivityTip(); if (count) selectActivityDate(date); }}
+					></button>
+				{:else}
+					<span class="m3-calendar__activity-cell m3-calendar__activity-cell--future" aria-hidden="true"></span>
+				{/if}
+			{/each}
+		</div>
+		<div class="m3-calendar__legend">
+			<span title={`${activityDays.find(Boolean)} — ${currentDay}`}>{activityEntriesLabel.replace("{count}", String(activityTotal))}</span>
+			<div class="m3-calendar__legend-scale">
+				<span>{activityLessLabel}</span>
+				{#each [0, 1, 2, 3, 4] as level}
+					<span class="m3-calendar__activity-cell" data-level={level} aria-hidden="true"></span>
+				{/each}
+				<span>{activityMoreLabel}</span>
+			</div>
+		</div>
+	</section>
 </div>
+
+{#if activityTip}
+	<div
+		id="calendar-activity-tooltip"
+		class="m3-calendar__activity-tooltip"
+		class:m3-calendar__activity-tooltip--below={activityTip.below}
+		role="tooltip"
+		bind:this={activityTipElement}
+		use:activityTooltip
+		style:left={`${activityTip.x}px`}
+		style:top={`${activityTip.y}px`}
+	>
+		<span>{activityTip.date}</span>
+		<strong>{activityEntriesLabel.replace("{count}", String(activityTip.count))}</strong>
+	</div>
+{/if}
 
 <style lang="stylus">
 	.m3-calendar
@@ -315,6 +492,128 @@ function toggleDay(cell: DayCell) {
 		&__panel
 			overflow: hidden
 
+		&__selection
+			margin: var(--m3e-space-1) 0
+			font: var(--m3e-type-label-medium)
+			color: var(--on-surface-variant)
+
+		&__activity
+			border-top: 1px solid unquote("color-mix(in oklab, var(--outline-variant) 60%, transparent)")
+			padding-top: var(--m3e-space-3)
+			margin-top: var(--m3e-space-1)
+
+		&__activity-title
+			margin: 0 0 var(--m3e-space-2)
+			font: var(--m3e-type-label-large)
+			color: var(--on-surface)
+			font-weight: 600
+
+		&__activity-months
+			display: grid
+			grid-template-columns: repeat(16, minmax(0, 1fr))
+			gap: calc(var(--m3e-space-1) / 2)
+			margin-bottom: var(--m3e-space-1)
+			font: var(--m3e-type-label-small)
+			color: var(--on-surface-variant)
+
+			span
+				white-space: nowrap
+
+		&__heatmap
+			display: grid
+			grid-template-rows: repeat(7, 1fr)
+			grid-auto-flow: column
+			grid-template-columns: repeat(16, minmax(0, 1fr))
+			gap: calc(var(--m3e-space-1) / 2)
+
+		&__activity-cell
+			aspect-ratio: 1
+			width: 85%
+			margin: auto
+			min-width: 0
+			padding: 0
+			border: 0
+			border-radius: var(--shape-corner-xs)
+			background: unquote("color-mix(in oklab, var(--on-surface) 7%, var(--surface))")
+			color: var(--primary)
+			cursor: pointer
+			transition:
+				box-shadow var(--m3e-duration-short) var(--m3e-easing-standard),
+				transform var(--m3e-duration-short) var(--m3e-easing-standard)
+
+			&[aria-disabled="true"]
+				cursor: default
+
+			&[data-level="1"]
+				background: unquote("color-mix(in oklab, var(--primary) 45%, var(--surface))")
+
+			&[data-level="2"]
+				background: unquote("color-mix(in oklab, var(--primary) 65%, var(--surface))")
+
+			&[data-level="3"]
+				background: unquote("color-mix(in oklab, var(--primary) 85%, var(--surface))")
+
+			&[data-level="4"]
+				background: var(--primary)
+
+			&--selected
+				box-shadow: 0 0 0 2px var(--primary)
+
+		&__heatmap .m3-calendar__activity-cell
+			&:hover, &:focus-visible
+				position: relative
+				z-index: 1
+				outline: none
+				box-shadow: 0 0 0 1.5px var(--primary)
+				transform: scale(1.12)
+
+		&__activity-tooltip
+			position: fixed
+			z-index: 120
+			display: flex
+			align-items: center
+			gap: var(--m3e-space-2)
+			width: max-content
+			max-width: calc(100vw - 1rem)
+			padding: var(--m3e-space-2) var(--m3e-space-3)
+			border-radius: var(--shape-corner-s)
+			background: var(--inverse-surface)
+			color: var(--inverse-on-surface)
+			font: var(--m3e-type-label-medium)
+			box-shadow: var(--m3e-elevation-2)
+			transform: translate(-50%, -100%)
+			pointer-events: none
+			white-space: nowrap
+
+			span
+				opacity: 0.8
+
+			strong
+				font-weight: 600
+
+			&--below
+				transform: translate(-50%, 0)
+
+			&--future
+				visibility: hidden
+
+		&__legend
+			display: flex
+			justify-content: space-between
+			align-items: center
+			gap: var(--m3e-space-2)
+			margin-top: var(--m3e-space-2)
+			font: var(--m3e-type-label-small)
+			color: var(--on-surface-variant)
+
+		&__legend-scale
+			display: flex
+			align-items: center
+			gap: calc(var(--m3e-space-1) / 2)
+
+			.m3-calendar__activity-cell
+				width: var(--m3e-space-2)
+
 		&__posts
 			list-style: none
 			margin: 0
@@ -374,4 +673,13 @@ function toggleDay(cell: DayCell) {
 			font: var(--m3e-type-label-medium)
 			color: var(--on-surface-variant)
 			font-variant-numeric: tabular-nums
+
+	@media (prefers-reduced-motion: reduce)
+		.m3-calendar__heatmap .m3-calendar__activity-cell:hover,
+		.m3-calendar__heatmap .m3-calendar__activity-cell:focus-visible
+			transform: none
+
+	:global(html.motion-reduced) .m3-calendar__heatmap .m3-calendar__activity-cell:hover,
+	:global(html.motion-reduced) .m3-calendar__heatmap .m3-calendar__activity-cell:focus-visible
+		transform: none
 </style>

@@ -292,8 +292,8 @@ body[data-current-page="home"] #navbar-wrapper {
 	position: fixed;
 	inset: 0 0 auto;
 	height: 4.5rem;
-	opacity: 0;
-	visibility: hidden;
+	opacity: 1;
+	visibility: visible;
 	transform: none;
 	transition: opacity 180ms ease, visibility 180ms ease;
 }
@@ -313,7 +313,9 @@ body[data-current-page="home"] .top-app-bar__nav-link {
 	flex-shrink: 0;
 }
 
-body[data-current-page="home"]:not([data-banner-scrolled="true"]) #navbar-wrapper {
+html[data-preview-mode="fullscreen"] body[data-current-page="home"]:not([data-banner-scrolled="true"]) #navbar-wrapper {
+	opacity: 0;
+	visibility: hidden;
 	pointer-events: none;
 }
 
@@ -499,3 +501,14 @@ html[data-preview-waves="false"] .banner-waves {display:none;}
 html.motion-reduced .firefly-entrance__scroll,
 html.motion-reduced .firefly-entrance__copy * {animation:none;}
 @media(prefers-reduced-motion:reduce) {.firefly-entrance__waves path {animation:none;}}
+
+/* Keep the fullscreen subtitle stable while Shirone types and deletes it. */
+.firefly-entrance__copy > p { min-height: 1.5em; }
+.firefly-entrance__copy > p[data-subtitle-state="typing"]::after {
+  content: ""; display: inline-block; width: .08em; height: 1em;
+  margin-inline-start: .12em; vertical-align: -.12em; background: currentColor;
+  animation: entrance-subtitle-caret var(--m3e-duration-long) steps(1,end) infinite;
+}
+@keyframes entrance-subtitle-caret { 50% { opacity: 0; } }
+html.motion-reduced .firefly-entrance__copy > p::after { display:none; }
+@media (prefers-reduced-motion: reduce) { .firefly-entrance__copy > p::after { display:none; } }

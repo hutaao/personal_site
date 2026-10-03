@@ -78,7 +78,7 @@ const links = [
 
 	<div class="firefly-entrance__copy">
 		<h1>{siteConfig.banner.homeText.title}</h1>
-		<p>{siteConfig.banner.homeText.subtitle[0]}</p>
+		<p aria-label={siteConfig.banner.homeText.subtitle[0]} data-subtitle-state="complete">{siteConfig.banner.homeText.subtitle[0]}</p>
 		<div class="firefly-entrance__socials">
 			<a href="https://github.com/hutaao" target="_blank" rel="noopener noreferrer">
 				<Icon name="fa6-brands:github" />
@@ -100,6 +100,18 @@ const links = [
 		const entrance = document.getElementById("firefly-entrance");
 		if (!entrance || entrance.dataset.bound === "true") return;
 		entrance.dataset.bound = "true";
+
+		// Both entrance modes share Shirone's typewriter, including reduced-motion behavior.
+		const source = document.querySelector<HTMLParagraphElement>("[data-banner-home-copy] p");
+		const target = entrance.querySelector<HTMLParagraphElement>(".firefly-entrance__copy > p");
+		if (source && target) {
+			const sync = () => {
+				target.textContent = source.textContent;
+				target.dataset.subtitleState = source.dataset.subtitleState;
+			};
+			new MutationObserver(sync).observe(source, { childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ["data-subtitle-state"] });
+			sync();
+		}
 
 		entrance.querySelector<HTMLButtonElement>(".firefly-entrance__scroll")?.addEventListener("click", () => {
 			document.getElementById("main-layout")?.scrollIntoView({ behavior: "smooth" });

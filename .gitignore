@@ -72,3 +72,10 @@ artifacts/lighthouse/*
 
 # generated AI skills plugin packages
 artifacts/shirone-ai-*
+
+# Local Obsidian writing vault and preview state
+blog-writing/
+.blog-local/
+
+# Local practice draft; never publish its Markdown or attachments.
+/src/content/posts/writing-practice/
