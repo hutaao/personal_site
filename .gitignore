@@ -76,6 +76,10 @@ artifacts/shirone-ai-*
 # Local Obsidian writing vault and preview state
 blog-writing/
 .blog-local/
+# Keep private writing instructions out even if copied outside the vault.
+00-博客编辑入口.md
+编辑目录说明.md
+内容配置.code-workspace
 
 # Local practice draft; never publish its Markdown or attachments.
 /src/content/posts/writing-practice/
