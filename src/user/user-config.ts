@@ -59,7 +59,7 @@ const site: DeepPartial<SiteConfig> = {
 		},
 		carousel: {
 			enable: true,
-			interval: 12000,
+			interval: 30000,
 			fadeDuration: 2000,
 			animation: "none",
 		},
