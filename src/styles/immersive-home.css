@@ -72,6 +72,23 @@ body[data-current-page="home"] .firefly-entrance {
 	transition: opacity 1200ms cubic-bezier(.2, 0, 0, 1);
 }
 .firefly-entrance__video--active { opacity: 1; }
+.firefly-entrance__copy,
+.firefly-entrance__scroll {
+	transition: opacity 1200ms cubic-bezier(.2, 0, 0, 1), visibility 0s;
+}
+.firefly-entrance:has(.firefly-entrance__video--active) .firefly-entrance__copy,
+.firefly-entrance:has(.firefly-entrance__video--active) .firefly-entrance__scroll {
+	opacity: 0 !important;
+	visibility: hidden;
+	pointer-events: none !important;
+	transition: opacity 1200ms cubic-bezier(.2, 0, 0, 1), visibility 0s 1200ms;
+}
+html.motion-reduced .firefly-entrance .firefly-entrance__copy,
+html.motion-reduced .firefly-entrance .firefly-entrance__scroll { transition: none; }
+@media (prefers-reduced-motion: reduce) {
+	.firefly-entrance .firefly-entrance__copy,
+	.firefly-entrance .firefly-entrance__scroll { transition: none; }
+}
 .firefly-entrance__video-control {
 	display: none;
 	position: absolute;
