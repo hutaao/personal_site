@@ -43,7 +43,7 @@
 
 GitHub Actions 的 [pages.yml](.github/workflows/pages.yml) 使用 Node.js 24 与 pnpm 9.14.4，安装锁定依赖，运行 Astro 检查、日历单元测试和完整生产构建。main 分支推送后自动部署到 GitHub Pages。
 
-本机 Obsidian 写作库不上传；云端构建使用仓库中已提交的公开内容。
+云端构建使用仓库中已提交的站点内容。
 
 ## 重要边界
 
