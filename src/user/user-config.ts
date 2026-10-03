@@ -47,6 +47,22 @@ const site: DeepPartial<SiteConfig> = {
 	title: "hutaao",
 	subtitle: "把好奇心，写成看得见的路径。",
 	banner: {
+		src: {
+			desktop: [
+				"assets/images/hutaao/background.png",
+				"assets/images/hutaao/wallpaper-58839867.jpg",
+			],
+			mobile: [
+				"assets/images/hutaao/background.png",
+				"assets/images/hutaao/wallpaper-58839867.jpg",
+			],
+		},
+		carousel: {
+			enable: true,
+			interval: 12000,
+			fadeDuration: 2000,
+			animation: "none",
+		},
 		video: {
 			sources: [
 				"/videos/mengdu-zhuyi.mp4",
