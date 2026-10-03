@@ -79,3 +79,8 @@ blog-writing/
 
 # Local practice draft; never publish its Markdown or attachments.
 /src/content/posts/writing-practice/
+
+# Local empty-content placeholders maintained by the writing vault.
+/public/music/README.txt
+/src/content/moments/README.txt
+/src/content/series/README.txt

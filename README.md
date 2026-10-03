@@ -1,38 +1,63 @@
-# hutaao 的学习手记
+# hutaao-blog
 
-基于 Astro、Shirone 和 Firefly 入场效果的个人博客，用于记录技术学习、科研与生活。
+基于 Astro、Shirone 与 Firefly 入场效果的个人博客。
+
+正式网站：https://hutaao.github.io/personal_site/
+
+## 日常编辑
+
+本机使用一个 Obsidian 写作库 `blog-writing`，从 `00-博客编辑入口.md` 开始。
+文章、动态、关于正文、相册、公告、个人资料与歌单集中管理，保存后通过内容同步器更新主项目和本地 4324 预览。
+
+写作库、Obsidian 设置、`.env`、`.blog-local` 和练习草稿不会提交。仓库中的 `src/content`、`src/data`、个人图片及 `src/user/user-config.ts` 是用于公开构建的内容；发布时只提交准备公开的文件。
 
 ## 本地运行
 
-需要 Node.js 22.12 以上和 pnpm 9.14.4。
+需要 Node.js 24 与 pnpm 9.14.4。首次安装：
 
 ```sh
 pnpm install --frozen-lockfile
-pnpm dev -- --port 4324
+pnpm dev
 ```
 
-主仓库预览地址为 `http://localhost:4324/personal_site/`。GitHub Pages 子路径已配置为 `/personal_site/`。
+主项目使用 `/personal_site/` 子路径。4324 是本机独立预览项目，通过桌面的“启动博客预览.cmd”启动，不是主项目端口的固定约定。
 
 ```sh
-pnpm astro check
+pnpm check
+node --test tests/calendar-activity.test.mjs
 pnpm build
+pnpm preview
 ```
 
-## 内容与外观
+构建包含内容同步、图标、动态缩略图、Astro 静态页面、Pagefind 搜索索引与字体检查。
 
-- 站点设置：`src/config/siteConfig.ts`
-- 个人资料：`src/config/profileConfig.ts`
-- 侧栏排列：`src/config/sidebarConfig.ts`
-- 文章：`src/content/posts/`
-- 动态：`src/content/moments/`
-- 壁纸与头像：`src/assets/images/hutaao/`
+## 发布与回退
 
-调色盘提供外观、壁纸和特效三组设置，保存访问者的本地偏好。横幅模式始终显示导航；全屏 Classic 入场在下滑进入阅读区后显示导航。侧栏包含动态摘要、站点信息与日历更新足迹，方块按每日文章发布、修改和动态统计。
+`.github/workflows/pages.yml` 在 `main` 推送后自动构建并部署到 GitHub Pages，也支持手动触发。
+GitHub 云端使用已提交的公开内容，不读取本机写作库。
 
-当前文章、动态等仍包含主题示例内容，后续可逐步替换。
+发布前核对差异并检查草稿与图片，避免直接提交私人内容。回退优先使用 `git revert` 生成新的恢复提交并重新部署，不强制改写远端历史。
+
+## 文件导航
+
+| 目录 | 用途 |
+| --- | --- |
+| `src/components`、`src/layouts`、`src/styles` | 主题组件与外观 |
+| `src/config`、`src/user` | 默认配置与同步后的个人配置 |
+| `src/content`、`src/data` | 公开文章和结构化内容 |
+| `public`、`src/assets` | 图片、图标、字体与静态资源 |
+| `scripts/content` | Obsidian 内容源同步与校验 |
+| `docs`、`rules` | 主题技术文档与维护约定 |
+| `tests` | 功能测试；部分上游测试需演示文章，不作为本站全套门禁 |
+| `.github/workflows/pages.yml` | Pages 自动发布 |
+
+演示文章、相册、歌曲、友链等已清空。当前没有正式文章，留言服务尚未接通；这些空状态属于当前内容状态。
+
+调色盘提供外观、壁纸与特效设置；Umami 显示访问统计。仅正式域名采集访问，本地预览不计入。
 
 ## 来源与许可
 
-主题基于 [LyraVoid/Shirone](https://github.com/LyraVoid/Shirone)，入场效果与樱花参考 [CuteLeaf/Firefly](https://github.com/CuteLeaf/Firefly)。保留原主题署名及 MIT 许可，见 `LICENSE` 和 `THIRD_PARTY_LICENSES/Firefly-LICENSE`。内容许可配置与素材各自的许可独立。
+主题基于 [LyraVoid/Shirone](https://github.com/LyraVoid/Shirone)，入场效果与樱花参考 [CuteLeaf/Firefly](https://github.com/CuteLeaf/Firefly)。保留主题署名、`LICENSE` 与 `THIRD_PARTY_LICENSES`。
+文章内容许可和图片、音乐等素材许可分别适用。
 
-推送源码不会自动启用 GitHub Pages 部署。
+更多技术细节见 [INDEX.md](INDEX.md) 和 [docs](docs)。`frontmatter.json` 是可选的上游编辑工具配置，当前日常写作以 Obsidian 库为准。
