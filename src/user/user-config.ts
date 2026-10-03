@@ -47,6 +47,14 @@ const site: DeepPartial<SiteConfig> = {
 	title: "hutaao",
 	subtitle: "把好奇心，写成看得见的路径。",
 	banner: {
+		video: {
+			sources: [
+				"/videos/mengdu-zhuyi.mp4",
+				"/videos/yuanshen.mp4",
+			],
+			order: "sequential",
+			endBehavior: "pause",
+		},
 		homeText: {
 			title: "welcome to my blog!",
 			subtitle: [
@@ -72,6 +80,11 @@ const profile: DeepPartial<ProfileConfig> = {
 			name: "GitHub",
 			icon: "fa6-brands:github",
 			url: "https://github.com/hutaao",
+		},
+		{
+			name: "Email",
+			icon: "material-symbols:mail-outline-rounded",
+			url: "mailto:hutaao1064@gmail.com",
 		},
 	],
 };

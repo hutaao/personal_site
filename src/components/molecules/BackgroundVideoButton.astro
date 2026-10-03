@@ -1,0 +1,21 @@
+---
+import { Icon } from "astro-icon/components";
+import IconButton from "@components/atoms/action/IconButton.svelte";
+interface Props { id: string }
+const { id } = Astro.props;
+---
+<span data-background-video-control>
+	<IconButton id={id} label="播放背景视频" class="shrink-0 background-video-toggle">
+		<Icon name="material-symbols:play-arrow-rounded" class="background-video-icon--play text-[1.25rem]" />
+		<Icon name="material-symbols:pause-rounded" class="background-video-icon--pause text-[1.25rem]" />
+	</IconButton>
+</span>
+<style is:global>
+.background-video-toggle .background-video-icon--pause { display: none; }
+.background-video-toggle[data-playing="true"] .background-video-icon--play { display: none; }
+.background-video-toggle[data-playing="true"] .background-video-icon--pause { display: block; }
+html[data-preview-mode="none"] [data-background-video-control],
+html[data-preview-mode="overlay"] [data-background-video-control],
+html:not([data-preview-layout="hero"]) body:not([data-current-page="home"]) [data-background-video-control],
+html:not([data-preview-mode="fullscreen"]) body:not([data-current-page="home"]) [data-background-video-control] { display: none; }
+</style>
