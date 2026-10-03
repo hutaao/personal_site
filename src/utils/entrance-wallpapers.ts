@@ -8,10 +8,9 @@ export function bindEntranceWallpapers(entrance: HTMLElement) {
 	const fade = Math.min(interval / 2, Math.max(300, Number(entrance.dataset.fade) || 2000));
 	const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
 	let index = 0;
-	let timer: ReturnType<typeof setTimeout>;
 	const preload = new Image();
 	preload.src = sources[1];
-	const schedule = (delay = interval) => { timer = setTimeout(() => { void rotate(); }, delay); };
+	const schedule = (delay = interval) => { setTimeout(() => { void rotate(); }, delay); };
 	async function rotate() {
 		if (!entrance.isConnected) return;
 		const mode = document.documentElement.dataset.previewMode;
@@ -39,5 +38,4 @@ export function bindEntranceWallpapers(entrance: HTMLElement) {
 		schedule(interval - fade - 50);
 	}
 	schedule();
-	document.addEventListener("swup:willReplaceContent", () => clearTimeout(timer), { once: true });
 }
