@@ -1,6 +1,6 @@
-# Shirone 部署分层索引
+# 部署分层说明
 
-本索引用于快速定位 Shirone 从源码到线上站点的部署边界。组件分层的权威定义仍以 [`docs/atomic-structure.md`](docs/atomic-structure.md) 为准；本文件只描述部署相关的目录、配置和验证入口。
+本文用于定位网站所用 Shirone 主题 从源码到线上站点的部署边界。组件分层的权威定义仍以 [`docs/atomic-structure.md`](atomic-structure.md) 为准；本文件只描述部署相关的目录、配置和验证入口。
 
 ## 分层总览
 
@@ -29,7 +29,7 @@
 
 ## 标准部署流程
 
-1. 在 [`src/config/siteConfig.ts`](src/config/siteConfig.ts) 和 [`astro.config.mjs`](astro.config.mjs) 中确认 `site`、`base` 与站点标识。
+1. 在 [`src/config/siteConfig.ts`](../src/config/siteConfig.ts) 和 [`astro.config.mjs`](../astro.config.mjs) 中确认 `site`、`base` 与站点标识。
 2. 安装锁定依赖：`pnpm.cmd install --frozen-lockfile`。
 3. 执行发布前检查：`npx.cmd astro check`、`pnpm.cmd check:manifest`、`pnpm.cmd type-check`；涉及页面或交互时，再运行对应的 Playwright 用例。
 4. 构建：`pnpm.cmd build`（包含内容同步、图标与缩略图生成、Astro、Pagefind 和字体检查），确认 `dist/` 生成且无构建错误。
@@ -41,27 +41,26 @@
 
 ## CI 对照
 
-GitHub Actions 的 [pages.yml](.github/workflows/pages.yml) 使用 Node.js 24 与 pnpm 9.14.4，安装锁定依赖，运行 Astro 检查、日历单元测试和完整生产构建。main 分支推送后自动部署到 GitHub Pages。
+GitHub Actions 的 [pages.yml](../.github/workflows/pages.yml) 使用 Node.js 24 与 pnpm 9.14.4，安装锁定依赖，运行 Astro 检查、日历单元测试和完整生产构建。main 分支推送后自动部署到 GitHub Pages。
 
 云端构建使用仓库中已提交的站点内容。
 
 ## 重要边界
 
 - `dist/` 是可删除并重新生成的构建产物，不纳入源码编辑流程。
-- `research/` 仅供参考，不参与构建和部署。
 - 可选功能默认关闭时必须满足零额外负担：不输出占位 DOM、不发起外部请求、不增加主 bundle。
 - 纯 SSR 页面不应无端添加 hydration 指令；需要交互的组件才使用 `client:load`、`client:visible` 或 `client:only`。
 - 部署 URL 或 `base` 变更后，应重新构建并验证资源链接和 Swup 导航，不能只替换托管平台域名。
 
 ## 相关文档
 
-- [`README.md`](README.md)：首次运行与常用命令
-- [`src/config/README.md`](src/config/README.md)：配置契约
-- [`docs/content-separation/`](docs/content-separation/README.md)：独立内容仓库、物化规则、配置覆盖与双仓 CI
-- [`docs/atomic-structure.md`](docs/atomic-structure.md)：组件分层
-- [`docs/m3e-standard.md`](docs/m3e-standard.md)：M3E 令牌与组件标准
-- [`docs/markdown-extensions.md`](docs/markdown-extensions.md)：Markdown 插件、样式所有权、缓存刷新与验证
-- [`docs/markdown-syntax-manifest.md`](docs/markdown-syntax-manifest.md)：自定义 Markdown 作者语法清单、状态与维护流程
-- [`docs/asset-pipeline.md`](docs/asset-pipeline.md)：本地图片、离线图标与生成资产流水线
-- [`rules/project-rules.md`](rules/project-rules.md)：质量门禁与提交流程
-- [`rules/pitfalls.md`](rules/pitfalls.md)：Astro/Svelte、缓存与测试注意事项
+- [`README.md`](../README.md)：网站介绍与使用方式
+- [`src/config/README.md`](../src/config/README.md)：配置契约
+- [`docs/content-separation/`](content-separation/README.md)：独立内容仓库、物化规则、配置覆盖与双仓 CI
+- [`docs/atomic-structure.md`](atomic-structure.md)：组件分层
+- [`docs/m3e-standard.md`](m3e-standard.md)：M3E 令牌与组件标准
+- [`docs/markdown-extensions.md`](markdown-extensions.md)：Markdown 插件、样式所有权、缓存刷新与验证
+- [`docs/markdown-syntax-manifest.md`](markdown-syntax-manifest.md)：自定义 Markdown 作者语法清单、状态与维护流程
+- [`docs/asset-pipeline.md`](asset-pipeline.md)：本地图片、离线图标与生成资产流水线
+- [`rules/project-rules.md`](../rules/project-rules.md)：质量门禁与提交流程
+- [`rules/pitfalls.md`](../rules/pitfalls.md)：Astro/Svelte、缓存与测试注意事项
