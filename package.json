@@ -2,16 +2,16 @@
   "name": "shirone",
   "type": "module",
   "version": "1.0.3",
-  "description": "An expressive, anime-inspired blog theme built on Material 3 Expressive, Astro 7, and Svelte 5",
+  "description": "hutaao personal blog for technical notes, programming practice, and everyday writing",
   "license": "MIT",
   "author": "matsuzaka-yuki",
-  "homepage": "https://shirone.mysqil.com/",
+  "homepage": "https://hutaao.github.io/personal_site/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/LyraVoid/Shirone.git"
+    "url": "https://github.com/hutaao/personal_site.git"
   },
   "bugs": {
-    "url": "https://github.com/LyraVoid/Shirone/issues"
+    "url": "https://github.com/hutaao/personal_site/issues"
   },
   "keywords": [
     "astro",
@@ -138,5 +138,6 @@
     "esbuild": "^0.28.2",
     "vite": "^8.3.0"
   },
-  "packageManager": "pnpm@9.14.4"
+  "packageManager": "pnpm@9.14.4",
+  "private": true
 }
