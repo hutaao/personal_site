@@ -26,6 +26,8 @@ export interface TrackDescriptor {
 	readonly artist?: string;
 	readonly source: string;
 	readonly cover?: string;
+	/** LRC 文件地址（public 路径或 HTTPS URL）。 */
+	readonly lyrics?: string;
 	/** 构建期生成的封面候选；远程 Meting 曲目保持为空。 */
 	readonly coverSrcset?: string;
 	readonly coverSizes?: string;

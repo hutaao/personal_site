@@ -12,4 +12,4 @@ import type { TrackDescriptor } from "@/types/musicConfig";
  * - source: 音频文件地址（相对 /public 或绝对 URL）
  * - duration: 曲目时长（秒，可选）
  */
-export const musicTracks: readonly TrackDescriptor[] = [];
+export const musicTracks: readonly TrackDescriptor[] = [{ id: "xiachong", title: "夏虫", artist: "洛天依", cover: "https://img1.kuwo.cn/star/albumcover/300/75/27/3202470885.jpg", lyrics: "/music/xiachong.lrc", source: "/music/xiachong.mp3" }];
