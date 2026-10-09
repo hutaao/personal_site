@@ -63,8 +63,9 @@ let snapshot = $state<MusicSnapshot>({
 let playlistOpen = $state(false);
 let lyricLines = $state<LyricLine[]>([]);
 let lyricStatus = $state<"loading" | "ready" | "error">("loading");
+const lyricSource = $derived(snapshot.currentTrack?.lyrics);
 $effect(() => {
-	const source = snapshot.currentTrack?.lyrics;
+	const source = lyricSource;
 	lyricLines = [];
 	lyricStatus = "loading";
 	if (!source) return;
