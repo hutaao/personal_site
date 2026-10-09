@@ -107,7 +107,8 @@ function normalizeTrack(
 			? track.duration
 			: undefined;
 
-	return Object.freeze({ id, title, source, artist, cover, duration });
+	const lyrics = track.lyrics ? (normalizeMediaSource(track.lyrics) ?? undefined) : undefined;
+	return Object.freeze({ id, title, source, artist, cover, duration, lyrics });
 }
 
 export function clampMusicVolume(value: number, fallback = 0.7): number {

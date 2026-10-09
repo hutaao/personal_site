@@ -5,6 +5,7 @@ import Tooltip from "@components/atoms/overlay/Tooltip.svelte";
 import Icon from "@iconify/svelte";
 import { collapse } from "@utils/motion";
 import { onMount } from "svelte";
+import { parseLrc, type LyricLine } from "@utils/music/lyrics";
 import type { ResolvedMusicOptions } from "@/config/musicConfig";
 import type {
 	MusicErrorCode,
@@ -60,6 +61,23 @@ let snapshot = $state<MusicSnapshot>({
 	error: hasInitialTracks || hasMeting ? null : "empty-playlist",
 });
 let playlistOpen = $state(false);
+let lyricLines = $state<LyricLine[]>([]);
+let lyricStatus = $state<"loading" | "ready" | "error">("loading");
+$effect(() => {
+	const source = snapshot.currentTrack?.lyrics;
+	lyricLines = [];
+	lyricStatus = "loading";
+	if (!source) return;
+	const controller = new AbortController();
+	void fetch(source, { signal: controller.signal }).then(async response => {
+		if (!response.ok) throw new Error("Lyrics unavailable");
+		const lines = parseLrc(await response.text());
+		if (controller.signal.aborted) return;
+		lyricLines = lines;
+		lyricStatus = lines.length ? "ready" : "error";
+	}).catch(() => { if (!controller.signal.aborted) lyricStatus = "error"; });
+	return () => controller.abort();
+});
 let playerEl = $state<HTMLElement | null>(null);
 const playlistId = "sidebar-music-playlist";
 
@@ -106,6 +124,7 @@ let dragTime = $state<number | null>(null);
 const currentEffectiveTime = $derived(
 	draggingSeek && dragTime !== null ? dragTime : snapshot.currentTime,
 );
+const lyricIndex = $derived(lyricLines.findLastIndex(line => line.time <= currentEffectiveTime));
 const progressMax = $derived(duration > 0 ? duration : 1);
 const progressRatio = $derived(
 	duration > 0 ? Math.min(Math.max(currentEffectiveTime / duration, 0), 1) : 0,
@@ -363,6 +382,17 @@ function setVolume(event: Event): void {
 			</Tooltip>
 		</div>
 
+		{#if snapshot.currentTrack?.lyrics}
+			<div class="music-player__lyrics" aria-label="同步歌词">
+				{#if lyricStatus === "ready"}
+					<p class="music-player__lyric-adjacent">{lyricLines[lyricIndex - 1]?.text || "\u00a0"}</p>
+					<p class="music-player__lyric-current">{lyricLines[lyricIndex]?.text || "\u00a0"}</p>
+					<p class="music-player__lyric-adjacent">{lyricLines[lyricIndex + 1]?.text || "\u00a0"}</p>
+				{:else}
+					<p>{lyricStatus === "loading" ? "歌词加载中…" : "歌词暂时无法加载"}</p>
+				{/if}
+			</div>
+		{/if}
 		<div
 			id={playlistId}
 			class="music-player__playlist-panel"
@@ -408,3 +438,10 @@ function setVolume(event: Event): void {
 	{/if}
 	<p class="sr-only" aria-live="polite" aria-atomic="true">{liveMessage}</p>
 </div>
+
+<style>
+.music-player__lyrics { padding: .5rem .25rem; text-align: center; min-height: 5rem; }
+.music-player__lyrics p { margin: .2rem 0; line-height: 1.5; overflow-wrap: anywhere; }
+.music-player__lyric-adjacent { font-size: .75rem; opacity: .55; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.music-player__lyric-current { font-size: .85rem; font-weight: 600; }
+</style>
