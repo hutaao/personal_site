@@ -3,6 +3,7 @@ import IconButton from "@components/atoms/action/IconButton.svelte";
 import ProgressIndicator from "@components/atoms/feedback/ProgressIndicator.svelte";
 import Tooltip from "@components/atoms/overlay/Tooltip.svelte";
 import Icon from "@iconify/svelte";
+import FloatingMusic from "./FloatingMusic.svelte";
 import { collapse } from "@utils/motion";
 import { onMount } from "svelte";
 import { parseLrc, type LyricLine } from "@utils/music/lyrics";
@@ -61,6 +62,13 @@ let snapshot = $state<MusicSnapshot>({
 	error: hasInitialTracks || hasMeting ? null : "empty-playlist",
 });
 let playlistOpen = $state(false);
+let floatingPlayer = $state(true);
+let floatingLyrics = $state(true);
+function setFloating(kind: "player" | "lyrics", enabled: boolean) {
+	if (kind === "player") floatingPlayer = enabled;
+	else floatingLyrics = enabled;
+	try { localStorage.setItem(`hutaao:music-floating-${kind}`, String(enabled)); } catch { /* Preferences are optional. */ }
+}
 let lyricLines = $state<LyricLine[]>([]);
 let lyricStatus = $state<"loading" | "ready" | "error">("loading");
 const lyricSource = $derived(snapshot.currentTrack?.lyrics);
@@ -151,6 +159,10 @@ const liveMessage = $derived.by(() => {
 });
 
 onMount(() => {
+	try {
+		floatingPlayer = localStorage.getItem("hutaao:music-floating-player") !== "false";
+		floatingLyrics = localStorage.getItem("hutaao:music-floating-lyrics") !== "false";
+	} catch { /* Keep defaults when storage is unavailable. */ }
 	let unsubscribe = () => {};
 	let active = true;
 	let viewportObserver: IntersectionObserver | null = null;
@@ -394,6 +406,14 @@ function setVolume(event: Event): void {
 				{/if}
 			</div>
 		{/if}
+		<div class="music-player__floating-settings">
+			<Tooltip label="悬浮歌词" placement="top">
+				<IconButton icon="material-symbols:subtitles-rounded" label="悬浮歌词" size="xsmall" toggle checked={floatingLyrics} onclick={() => setFloating("lyrics", !floatingLyrics)} />
+			</Tooltip>
+			<Tooltip label="悬浮播放器" placement="top">
+				<IconButton icon="material-symbols:album-rounded" label="悬浮播放器" size="xsmall" toggle checked={floatingPlayer} onclick={() => setFloating("player", !floatingPlayer)} />
+			</Tooltip>
+		</div>
 		<div
 			id={playlistId}
 			class="music-player__playlist-panel"
@@ -440,9 +460,12 @@ function setVolume(event: Event): void {
 	<p class="sr-only" aria-live="polite" aria-atomic="true">{liveMessage}</p>
 </div>
 
+<FloatingMusic {snapshot} {lyricLines} {lyricIndex} {runtime} playerEnabled={floatingPlayer} lyricsEnabled={floatingLyrics} onClosePlayer={() => setFloating("player", false)} onCloseLyrics={() => setFloating("lyrics", false)} />
+
 <style>
 .music-player__lyrics { padding: .5rem .25rem; text-align: center; min-height: 5rem; }
 .music-player__lyrics p { margin: .2rem 0; line-height: 1.5; overflow-wrap: anywhere; }
 .music-player__lyric-adjacent { font-size: .75rem; opacity: .55; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 .music-player__lyric-current { font-size: .85rem; font-weight: 600; }
+.music-player__floating-settings { display: flex; gap: .25rem; justify-content: flex-end; }
 </style>
