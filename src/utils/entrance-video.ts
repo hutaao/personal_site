@@ -1,3 +1,5 @@
+import { claimMediaPlayback } from "./media-playback";
+
 const TOGGLE_EVENT = "banner-video:toggle";
 const STATE_EVENT = "banner-video:state-change";
 
@@ -16,6 +18,7 @@ export function bindEntranceVideo(): void {
 	let pending = false;
 	let frame = 0;
 	let cleanup: (() => void) | undefined;
+	const playbackOwner = {};
 
 	function eligible(): boolean {
 		const entrance = video?.closest<HTMLElement>("#firefly-entrance");
@@ -61,6 +64,7 @@ export function bindEntranceVideo(): void {
 
 	async function play(): Promise<void> {
 		if (!video || !sources.length || !eligible()) return;
+		claimMediaPlayback(playbackOwner, stop);
 		const target = video;
 		const request = ++generation;
 		wantsPlayback = true;

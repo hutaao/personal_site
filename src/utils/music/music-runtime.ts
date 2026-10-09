@@ -11,6 +11,7 @@ import type {
 import { MUSIC_VOLUME_STORAGE_KEY, PLAYBACK_MODES } from "./constants";
 import { fetchMetingTracks } from "./meting";
 import { nextTrackIndex, previousTrackIndex } from "./playlist";
+import { claimMediaPlayback, releaseMediaPlayback } from "../media-playback";
 
 interface RuntimeState {
 	currentIndex: number;
@@ -96,6 +97,13 @@ export function createMusicRuntime(
 	options: ResolvedMusicOptions,
 	dependencies: MusicRuntimeDependencies = {},
 ): MusicRuntime {
+	const playbackOwner = {};
+	function pauseForOtherMedia(): void {
+		playbackRequested = false;
+		playbackAttemptGeneration += 1;
+		audio?.pause();
+		patch({ status: state.currentTime > 0 ? "paused" : "ready" });
+	}
 	let currentPlaylist: readonly TrackDescriptor[] = Object.freeze(
 		options.playlist.map((track) => Object.freeze({ ...track })),
 	);
@@ -399,6 +407,7 @@ export function createMusicRuntime(
 	}
 
 	async function playLoadedSource(resetRecovery = true): Promise<void> {
+		claimMediaPlayback(playbackOwner, pauseForOtherMedia);
 		if (resetRecovery) failedTrackIds.clear();
 		playbackRequested = true;
 		const attempt = ++playbackAttemptGeneration;
@@ -602,6 +611,7 @@ export function createMusicRuntime(
 			patch({ mode });
 		},
 		destroy() {
+			releaseMediaPlayback(playbackOwner);
 			lifecycleGeneration += 1;
 			sourceGeneration += 1;
 			playbackAttemptGeneration += 1;
