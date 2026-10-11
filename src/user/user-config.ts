@@ -51,10 +51,12 @@ const site: DeepPartial<SiteConfig> = {
 			desktop: [
 				"assets/images/hutaao/background.png",
 				"assets/images/hutaao/wallpaper-58839867.jpg",
+				"assets/images/hutaao/wallpaper-7691368225762478159.jpg",
 			],
 			mobile: [
 				"assets/images/hutaao/background.png",
 				"assets/images/hutaao/wallpaper-58839867.jpg",
+				"assets/images/hutaao/wallpaper-7691368225762478159.jpg",
 			],
 		},
 		carousel: {
