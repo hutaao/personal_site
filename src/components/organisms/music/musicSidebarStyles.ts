@@ -311,12 +311,19 @@ export const musicSidebarStylus = `
 		padding: 0.25rem 0 0
 		overflow-y: auto
 		overscroll-behavior: contain
-		scrollbar-width: none
-		-webkit-mask-image: linear-gradient(to bottom, black calc(100% - 1.5rem), transparent 100%)
-		mask-image: linear-gradient(to bottom, black calc(100% - 1.5rem), transparent 100%)
+		scrollbar-width: thin
+		scrollbar-color: var(--outline-variant) transparent
+		scrollbar-gutter: stable
+
+		> li
+			flex-shrink: 0
 
 		&::-webkit-scrollbar
-			display: none
+			width: 6px
+
+		&::-webkit-scrollbar-thumb
+			background: var(--outline-variant)
+			border-radius: 999px
 
 	&__playlist-item
 		width: 100%
