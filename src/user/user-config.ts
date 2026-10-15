@@ -143,7 +143,7 @@ const music: DeepPartial<MusicConfig> = {
 // config/umami.yaml
 const umami: DeepPartial<UmamiConfig> = {
 	enable: true,
-	shareUrl: "https://cloud.umami.is/analytics/us/share/HylggNPcWDlhBeZV",
+	shareUrl: "",
 	websiteId: "a767980f-2749-4db7-8e3a-753debcd592c",
 	scriptUrl: "https://cloud.umami.is/script.js",
 };

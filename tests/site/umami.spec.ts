@@ -101,7 +101,7 @@ test.describe("Umami analytics", () => {
 	test("disabled mode has no analytics DOM, runtime, or requests", async ({
 		page,
 	}) => {
-		test.skip(umamiEnabled, "This assertion covers the default disabled mode");
+		test.skip(umamiConfig.enable, "This assertion covers collection disabled; tracking-only mode has separate tests");
 		const analyticsRequests: string[] = [];
 		page.on("request", (request) => {
 			if (/oddmisc|127\.0\.0\.1:4321\/api/i.test(request.url())) {

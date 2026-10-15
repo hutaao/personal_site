@@ -1,6 +1,10 @@
 # Umami 统计集成指南
 
-本项目使用 [oddmisc](https://www.npmjs.com/package/oddmisc) 集成 Umami 网站统计。
+本项目支持 Umami 访问采集；可选的公开统计读取由 [oddmisc](https://www.npmjs.com/package/oddmisc) 提供。
+
+本站当前采用仅采集模式：`enable: true`，填写 `websiteId` 与 `scriptUrl`，将 `shareUrl` 留空。
+个人资料卡和文章页不显示浏览量，不加载公开统计客户端；站长登录 Umami 后台查看数据。
+网页移除分享链接不会撤销 Umami 服务端已经创建的分享权限；如需限制数据访问，还须在 Umami 后台关闭或删除对应分享。
 
 ## 快速开始
 

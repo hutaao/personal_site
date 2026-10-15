@@ -13,7 +13,7 @@ export const umamiConfig: UmamiConfig = withUserConfig("umami", {
 	/** 全局 Umami 统计总开关：false 时完全不加载 oddmisc 运行时脚本与 DOM */
 	enable: true,
 	/** Umami 分享链接（必填） */
-	shareUrl: "https://cloud.umami.is/analytics/us/share/HylggNPcWDlhBeZV",
+	shareUrl: "", // 不向访客提供公开统计；站长登录 Umami 后台查看
 	/** Umami Website ID；与 scriptUrl 同时填写时启用访问采集 */
 	websiteId: "a767980f-2749-4db7-8e3a-753debcd592c",
 	/** Umami 采集脚本 URL；与 websiteId 同时填写时启用访问采集 */
@@ -36,6 +36,14 @@ export function resolveUmamiOptions(config: UmamiConfig): ResolvedUmamiOptions {
 		websiteId: config.websiteId?.trim() || undefined,
 		scriptUrl: config.scriptUrl?.trim() || undefined,
 	};
+}
+
+/** Tracking is independent of public share access: hiding metrics must not stop collection. */
+export function resolveUmamiTrackingOptions(config: UmamiConfig) {
+	if (!config.enable) return null;
+	const websiteId = config.websiteId?.trim();
+	const scriptUrl = config.scriptUrl?.trim();
+	return websiteId && scriptUrl ? { websiteId, scriptUrl } : null;
 }
 
 export type { ResolvedUmamiOptions };

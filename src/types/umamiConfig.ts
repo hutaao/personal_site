@@ -4,7 +4,7 @@
 export type UmamiConfig = {
 	/** 全局 Umami 统计总开关：false 时完全不加载 oddmisc 运行时脚本与 DOM */
 	enable: boolean;
-	/** Umami 分享链接（必填） */
+	/** 公开读取统计的分享链接；空字符串关闭展示，不影响已配置的采集。 */
 	shareUrl: string;
 	/** Umami Website ID；与 scriptUrl 同时配置时启用访问采集。 */
 	websiteId?: string;

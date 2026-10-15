@@ -11,6 +11,7 @@ import {
 	resolvedFontOptions,
 	resolveTextureOptions,
 	resolveUmamiOptions,
+	resolveUmamiTrackingOptions,
 	siteConfig,
 	umamiConfig,
 } from "@/config";
@@ -89,6 +90,7 @@ const defaultTexturePreset = textureOptions.defaultPreset;
 const defaultTextureOpacity = textureOptions.defaultOpacity;
 const textureEnabled = textureOptions.enable;
 const umamiOptions = resolveUmamiOptions(umamiConfig);
+const umamiTracking = resolveUmamiTrackingOptions(umamiConfig);
 
 const hasDesktopBanner = hasBannerImages(siteConfig.banner.src.desktop);
 const hasMobileBanner = hasBannerImages(siteConfig.banner.src.mobile);
@@ -154,8 +156,8 @@ const hasMonoFont =
 		{hasBodyFont && <Font cssVariable={resolvedFontOptions.roles.body.cssVariable as never} preload={resolvedFontOptions.roles.body.preload} />}
 		{hasCjkFont && <Font cssVariable={resolvedFontOptions.roles.cjk.cssVariable as never} preload={resolvedFontOptions.roles.cjk.preload} />}
 		{hasMonoFont && <Font cssVariable={resolvedFontOptions.roles.mono.cssVariable as never} preload={resolvedFontOptions.roles.mono.preload} />}
-		{umamiOptions?.websiteId && umamiOptions.scriptUrl && (
-			<script is:inline async src={umamiOptions.scriptUrl} data-website-id={umamiOptions.websiteId} data-auto-track="true" data-domains={new URL(siteConfig.site).hostname}></script>
+		{umamiTracking && (
+			<script is:inline async src={umamiTracking.scriptUrl} data-website-id={umamiTracking.websiteId} data-auto-track="true" data-domains={new URL(siteConfig.site).hostname}></script>
 		)}
 				{favicons.map(favicon => (
 			<link rel="icon"

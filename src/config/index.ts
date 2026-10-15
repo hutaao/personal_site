@@ -75,5 +75,6 @@ export { timelineConfig } from "./timelineConfig";
 export {
 	type ResolvedUmamiOptions,
 	resolveUmamiOptions,
+	resolveUmamiTrackingOptions,
 	umamiConfig,
 } from "./umamiConfig";
