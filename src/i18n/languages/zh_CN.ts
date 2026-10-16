@@ -370,7 +370,7 @@ export const zh_CN: Translation = {
 	[Key.feedLink]: "订阅地址",
 	[Key.feedHowToUse]: "如何订阅",
 	[Key.feedHowToUseDesc]:
-		"将上方订阅地址添加到任意 RSS/Atom 阅读器（如 NetNewsWire、Feedly、Inoreader、Follow 等），即可即时接收新文章推送。",
+		"点击“复制链接”，在 RSS/Atom 阅读器中选择“添加订阅”并粘贴地址。阅读器下次刷新时即可获取新文章，无需提供邮箱。直接打开 XML 仅用于查看原始订阅数据。",
 	[Key.feedOpenXml]: "查看原始 XML",
 	[Key.feedRecentPosts]: "最新推送文章",
 };

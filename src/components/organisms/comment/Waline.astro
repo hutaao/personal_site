@@ -1,6 +1,7 @@
 ---
 import "@waline/client/waline.css";
 import type { CommentContext, WalineConfig } from "@/types/commentConfig";
+import { url } from "@utils/url-utils";
 
 interface Props { context: CommentContext; config: WalineConfig; lazy?: boolean; }
 const { context, config, lazy = true } = Astro.props;
@@ -14,6 +15,11 @@ const { context, config, lazy = true } = Astro.props;
   <p class="waline-meta-help">昵称必填，邮箱和网址选填；邮箱用于匹配头像及接收评论回复通知（通知功能暂未开启），邮箱地址不会公开展示。</p>
   {config.imageUploader && <p class="waline-meta-help">原图最多 5 MB，自动缩小压缩；动图需在 300 KB 以内、长边不超过 1600 像素。</p>}
   <div class="waline-mount"></div>
+  <p data-comment-anchor-help hidden role="status" class="waline-meta-help">正在定位订阅中的留言…</p>
+  <nav class="waline-subscriptions" aria-label="评论订阅">
+    <a href={`${url("/rss/comments/")}?path=${encodeURIComponent(context.key)}`}>订阅本页评论</a>
+    <a href={url("/rss/comments/")}>订阅本站评论</a>
+  </nav>
   <div data-waline-error hidden role="alert">
     留言区暂时未能加载。<button type="button" data-waline-retry>重试</button>
   </div>
@@ -24,7 +30,7 @@ const { context, config, lazy = true } = Astro.props;
   import type { WalineInstance } from "@waline/client";
   import { prepareCommentImage, uploadCommentImage } from "@/utils/comment-image-upload";
 
-  type MountState = { instance?: WalineInstance; observer?: IntersectionObserver; avatarAbort?: AbortController; badgeObserver?: MutationObserver; cancelled: boolean; started?: boolean };
+  type MountState = { instance?: WalineInstance; observer?: IntersectionObserver; avatarAbort?: AbortController; badgeObserver?: MutationObserver; cancelled: boolean; started?: boolean; anchorScrolled?: boolean; anchorTimer?: number };
   const mounts = new Map<HTMLElement, MountState>();
   const fallbackAvatar = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><rect width="48" height="48" rx="24" fill="#e5edf0"/><circle cx="24" cy="18" r="8" fill="#627d87"/><path d="M9 44v-5a15 15 0 0 1 30 0v5" fill="#627d87"/></svg>')}`;
 
@@ -33,6 +39,7 @@ const { context, config, lazy = true } = Astro.props;
     state.observer?.disconnect();
     state.avatarAbort?.abort();
     state.badgeObserver?.disconnect();
+    if (state.anchorTimer) clearTimeout(state.anchorTimer);
     state.instance?.destroy();
     mounts.delete(wrapper);
   }
@@ -92,16 +99,38 @@ const { context, config, lazy = true } = Astro.props;
                 ? uploadCommentImage(file, wrapper.dataset.serverUrl!)
                 : prepareCommentImage(file)
               : false,
-            search: false, reaction: false, pageview: false, comment: false,
+            search: false, reaction: false, pageview: false, comment: false, noRss: true,
           });
           if (state.cancelled || !wrapper.isConnected) { instance?.destroy(); return; }
           if (!instance) throw new Error("Waline mount target is unavailable");
           state.instance = instance;
           const nickInput = target.querySelector<HTMLInputElement>('input[name="nick"]');
           if (nickInput) { nickInput.required = true; nickInput.setAttribute("aria-required", "true"); }
-          state.badgeObserver = new MutationObserver(() => updateOwnerBadges(target));
+          const syncComments = () => {
+            updateOwnerBadges(target);
+            if (state.anchorScrolled || !location.hash) return;
+            let id: string;
+            try { id = decodeURIComponent(location.hash.slice(1)); } catch { return; }
+            const comment = document.getElementById(id);
+            if (comment && target.contains(comment)) {
+              state.anchorScrolled = true;
+              if (state.anchorTimer) clearTimeout(state.anchorTimer);
+              wrapper.querySelector<HTMLElement>("[data-comment-anchor-help]")!.hidden = true;
+              comment.scrollIntoView({ block: "center", behavior: "instant" });
+            }
+          };
+          state.badgeObserver = new MutationObserver(syncComments);
           state.badgeObserver.observe(target, { childList: true, subtree: true });
-          updateOwnerBadges(target);
+          if (/^#\d+$/.test(location.hash)) {
+            const help = wrapper.querySelector<HTMLElement>("[data-comment-anchor-help]")!;
+            help.hidden = false;
+            state.anchorTimer = window.setTimeout(() => {
+              if (state.cancelled || state.anchorScrolled) return;
+              help.textContent = "已打开对应评论区。若尚未显示该留言，请加载更多评论或展开回复；留言也可能已被删除。";
+              help.scrollIntoView({ block: "center", behavior: "instant" });
+            }, 6000);
+          }
+          syncComments();
           target.querySelector<HTMLTextAreaElement>(".wl-editor")?.setAttribute("aria-label", "留言内容");
           const upload = target.querySelector<HTMLElement>('label[for="wl-image-upload"]');
           if (upload) {
@@ -129,7 +158,7 @@ const { context, config, lazy = true } = Astro.props;
           console.error("[Waline] Initialization failed", error);
         }
       };
-      if (wrapper.dataset.lazy === "true" && "IntersectionObserver" in window) {
+      if (!location.hash && wrapper.dataset.lazy === "true" && "IntersectionObserver" in window) {
         state.observer = new IntersectionObserver((entries) => {
           if (entries.some((entry) => entry.isIntersecting)) void start();
         }, { rootMargin: "200px" });
@@ -179,6 +208,8 @@ const { context, config, lazy = true } = Astro.props;
   .shirone-waline .wl-editor, .shirone-waline input, .shirone-waline button { font-family: inherit; }
   .shirone-waline .wl-editor { min-height: 8rem; }
   .shirone-waline .waline-meta-help { margin: 0 0 .75rem; font-size: .875rem; color: var(--on-surface-variant); }
+  .shirone-waline .waline-subscriptions { display: flex; flex-wrap: wrap; gap: .75rem 1.25rem; margin-top: 1rem; font-size: .875rem; }
+  .shirone-waline .waline-subscriptions a { color: var(--primary); text-decoration: underline; text-underline-offset: .2em; }
   .shirone-waline .waline-owner-badge {
     display: inline-flex; align-items: center; margin-inline-start: .4rem;
     padding: .1rem .4rem; border-radius: .25rem;

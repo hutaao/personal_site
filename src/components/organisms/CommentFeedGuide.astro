@@ -1,0 +1,89 @@
+---
+import Card from "@components/atoms/display/Card.svelte";
+import { commentConfig } from "@/config";
+import { url } from "@utils/url-utils";
+const serverURL = commentConfig.waline?.serverURL ?? "";
+const feedURL = serverURL ? `${serverURL.replace(/\/$/, "")}/api/comment/rss` : "";
+---
+  <div data-comment-feed-guide data-server-feed={feedURL}>
+    <Card color="var(--card-bg)" radius="l" class="p-6 md:p-8 mb-4">
+      <h1>订阅评论更新</h1>
+      <p>将订阅地址添加到 RSS 阅读器，即可在阅读器下次刷新时看到新留言和回复。无需提供邮箱，也不会自动开启邮件或浏览器通知。</p>
+      <ol>
+        <li>选择下面的订阅范围，点击“复制订阅地址”。</li>
+        <li>在你使用的 RSS 阅读器中选择“添加订阅”，粘贴地址并确认。</li>
+        <li>之后打开阅读器刷新，即可查看更新；点击条目可返回博客。</li>
+      </ol>
+    </Card>
+    {[{ scope: "page", title: "本页评论", hint: "只订阅当前页面下的新留言和回复。" }, { scope: "site", title: "本站评论", hint: "订阅本站所有评论区的新留言和回复。" }].map(({scope, title, hint}) => (
+      <Card color="var(--card-bg)" radius="l" class="p-6 mb-4">
+        <section data-comment-feed-scope={scope} hidden={scope === "page"}>
+          <h2 data-comment-feed-heading>{title}</h2>
+          <p>{hint}</p>
+          <label for={`comment-feed-${scope}`}>RSS 订阅地址</label>
+          <input id={`comment-feed-${scope}`} data-comment-feed-address readonly value={feedURL} />
+          <div class="feed-actions">
+            <button type="button" data-subscription-copy>复制订阅地址</button>
+            <a data-comment-feed-xml href={feedURL} target="_blank" rel="noopener noreferrer" data-no-swup>查看原始 XML</a>
+          </div>
+          <p data-subscription-status role="status" aria-live="polite"></p>
+        </section>
+      </Card>
+    ))}
+    <Card color="var(--card-bg)" radius="l" class="p-6 mb-4">
+      <h2>文章更新与评论更新有什么区别？</h2>
+      <p>文章订阅推送新文章；评论订阅推送留言和回复。它们是两个独立的订阅源，可按需添加。</p>
+      <a href={url("/rss/")}>前往文章订阅</a>
+      <p>“查看原始 XML”供阅读器读取和排查使用，浏览器显示 XML 是正常现象，不代表订阅失败。评论订阅是公开来源，任何订阅者均可读取公开留言。</p>
+    </Card>
+  </div>
+<script>
+  function setupCommentFeeds() {
+    const root = document.querySelector<HTMLElement>("[data-comment-feed-guide]");
+    if (!root?.dataset.serverFeed) return;
+    const key = new URL(location.href).searchParams.get("path");
+    root.querySelectorAll<HTMLElement>("[data-comment-feed-scope]").forEach(section => {
+      const pageOnly = section.dataset.commentFeedScope === "page";
+      const card = section.parentElement;
+      if (card) card.hidden = pageOnly && !key;
+      section.hidden = pageOnly && !key;
+      const address = new URL(root.dataset.serverFeed!);
+      if (pageOnly && key) address.searchParams.set("path", key);
+      if (pageOnly && key === "page:guestbook") section.querySelector("h2")!.textContent = "留言板评论";
+      const input = section.querySelector<HTMLInputElement>("[data-comment-feed-address]")!;
+      input.value = address.href;
+      section.querySelector<HTMLAnchorElement>("[data-comment-feed-xml]")!.href = address.href;
+      input.onclick = () => input.select();
+    });
+  }
+  setupCommentFeeds();
+  function bindFeedNavigation() {
+    window.swup?.hooks.on("page:view", setupCommentFeeds);
+    window.swup?.hooks.on("content:replace", setupCommentFeeds);
+  }
+  bindFeedNavigation();
+  document.addEventListener("swup:enable", bindFeedNavigation, { once: true });
+  document.addEventListener("swup:page:view", setupCommentFeeds);
+  document.addEventListener("swup:content:replace", setupCommentFeeds);
+  document.addEventListener("click", async event => {
+    const button = (event.target as HTMLElement)?.closest<HTMLButtonElement>("[data-subscription-copy]");
+    if (!button) return;
+    const section = button.closest("section")!;
+    const input = section.querySelector<HTMLInputElement>("[data-comment-feed-address]")!;
+    const status = section.querySelector<HTMLElement>("[data-subscription-status]")!;
+    try { await navigator.clipboard.writeText(input.value); status.textContent = "已复制，请粘贴到 RSS 阅读器中添加订阅。"; }
+    catch { input.focus(); input.select(); status.textContent = "浏览器未允许自动复制，地址已选中，请按 Ctrl+C（Mac 使用 ⌘C）复制。"; }
+  });
+</script>
+<style>
+  h1 { font-size: 1.75rem; font-weight: 700; }
+  h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: .75rem; }
+  p, ol { margin: .75rem 0; line-height: 1.8; color: var(--on-surface-variant); }
+  ol { padding-left: 1.5rem; list-style: decimal; }
+  label { display: block; margin: 1rem 0 .4rem; font-size: .875rem; }
+  input { width: 100%; box-sizing: border-box; border: 1px solid var(--outline-variant); border-radius: var(--shape-corner-s); padding: .75rem; background: var(--surface-container-low); color: var(--on-surface); font-family: monospace; }
+  .feed-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-top: 1rem; }
+  button { border-radius: var(--shape-corner-s); background: var(--primary); color: var(--on-primary); padding: .6rem 1rem; cursor: pointer; }
+  a { color: var(--primary); text-decoration: underline; text-underline-offset: .2em; }
+  [hidden] { display: none !important; }
+</style>

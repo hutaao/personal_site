@@ -58,7 +58,9 @@ const posts = allPosts.slice(0, 6);
 			<code
 				data-feed-url-display
 				data-feed-relative-url={feedUrl}
-				class="flex-1 px-4 py-3 rounded-[var(--shape-corner-m)] bg-[var(--surface-container-high)] text-[var(--on-surface)] font-mono text-sm border border-[var(--outline-variant)] select-all break-all"
+				tabindex="0"
+                aria-label="RSS 订阅地址"
+                class="flex-1 px-4 py-3 rounded-[var(--shape-corner-m)] bg-[var(--surface-container-high)] text-[var(--on-surface)] font-mono text-sm border border-[var(--outline-variant)] select-all break-all"
 			>
 				{feedAbsoluteUrl}
 			</code>
@@ -159,44 +161,6 @@ const posts = allPosts.slice(0, 6);
 	import I18nKey from "@i18n/i18nKey";
 	import { i18n } from "@i18n/translation";
 
-	function syncDynamicFeedUrls(): void {
-		if (typeof window === "undefined") return;
-		const currentOrigin = window.location.origin;
-
-		document
-			.querySelectorAll<HTMLElement>("[data-feed-relative-url]")
-			.forEach((element) => {
-				const relativeUrl = element.dataset.feedRelativeUrl;
-				if (!relativeUrl) return;
-				const fullUrl = new URL(relativeUrl, currentOrigin).href;
-
-				if (element.hasAttribute("data-feed-url-display")) {
-					element.textContent = fullUrl;
-				}
-				if (element.hasAttribute("data-feed-copy-btn")) {
-					element.dataset.feedUrl = fullUrl;
-				}
-				if (
-					element instanceof HTMLAnchorElement &&
-					element.hasAttribute("data-feed-xml-link")
-				) {
-					element.href = fullUrl;
-				}
-			});
-	}
-
-	syncDynamicFeedUrls();
-
-	function bindSwupFeedHook(): void {
-		if (window.swup) {
-			window.swup.hooks.on("page:view", syncDynamicFeedUrls);
-			window.swup.hooks.on("content:replace", syncDynamicFeedUrls);
-		}
-	}
-
-	bindSwupFeedHook();
-	document.addEventListener("swup:enable", bindSwupFeedHook, { once: true });
-
 	document.addEventListener("click", async (event) => {
 		const target = event.target as HTMLElement | null;
 		const btn = target?.closest<HTMLElement>("[data-feed-copy-btn]");
@@ -212,7 +176,9 @@ const posts = allPosts.slice(0, 6);
 				icon: "material-symbols:link-rounded",
 			});
 		} catch {
-			showSnackbar(i18n(I18nKey.copyFailed));
+			const display = document.querySelector<HTMLElement>("[data-feed-url-display]");
+            if (display) { const range = document.createRange(); range.selectNodeContents(display); const selection = window.getSelection(); selection?.removeAllRanges(); selection?.addRange(range); display.focus(); }
+            showSnackbar("地址已选中，请手动复制并添加到 RSS 阅读器。");
 		}
 	});
 </script>
