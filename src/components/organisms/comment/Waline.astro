@@ -11,7 +11,7 @@ const { context, config, lazy = true } = Astro.props;
   data-emoji={JSON.stringify(config.emoji ?? false)} data-image-uploader={String(config.imageUploader ?? false)}
   data-image-storage={config.imageStorage ?? "inline"}>
   <p data-waline-loading role="status">正在加载留言区…</p>
-  <p class="waline-meta-help">昵称、邮箱和网址均选填；邮箱用于匹配头像，不填也可以留言。</p>
+  <p class="waline-meta-help">昵称、邮箱和网址均选填；邮箱用于匹配头像及接收评论回复通知（通知功能暂未开启），邮箱地址不会公开展示。</p>
   {config.imageUploader && <p class="waline-meta-help">原图最多 5 MB，自动缩小压缩；动图需在 300 KB 以内、长边不超过 1600 像素。</p>}
   <div class="waline-mount"></div>
   <div data-waline-error hidden role="alert">
