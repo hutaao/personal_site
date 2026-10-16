@@ -177,7 +177,7 @@ const effectiveUpdatedDate = entry.data.updated ?? entry.data.published;
 const publishedInstant = getPublishedInstant(entry.data);
 const updatedInstant = getUpdatedInstant(entry.data);
 const postCommentEnabled =
-	entry.data.comment !== false && Boolean(resolveCommentOptions(commentConfig));
+	entry.data.comment !== false && !commentConfig.guestbookOnly && Boolean(resolveCommentOptions(commentConfig));
 const lastUpdatedNotice = resolveLastUpdatedNoticeOptions(articleConfig);
 const shareOptions = resolveArticleShareOptions(articleConfig);
 const umamiEnabled = resolveUmamiOptions(umamiConfig) !== null;

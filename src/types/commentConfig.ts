@@ -1,4 +1,18 @@
-export type CommentProvider = "none" | "twikoo" | "giscus";
+export type CommentProvider = "none" | "twikoo" | "giscus" | "waline";
+
+export interface WalineConfig {
+	serverURL: string;
+	lang: string;
+	placeholder?: string;
+	/** true 使用默认表情包，或填写表情包地址数组。 */
+	emoji?: boolean | string[];
+	/** 开启受大小限制和压缩处理的图片插入；暂以 Base64 随评论存储。 */
+	imageUploader?: boolean;
+	/** inline 保留原有小图插入；blob 使用评论后端上传到 Vercel Blob。 */
+	imageStorage?: "inline" | "blob";
+	/** 仅由本机调试服务读取，不是云端配置。 */
+	localServer?: { commentInterval?: number; showBrowser?: boolean; showRegion?: boolean };
+}
 
 export interface TwikooConfig {
 	/** Twikoo 环境 ID 或后端服务地址 URL */
@@ -18,6 +32,11 @@ export interface CommentConfig {
 	provider: CommentProvider;
 	/** 是否开启视口懒加载（进入视口前不加载外部脚本） */
 	lazy: boolean;
+	/** 只在留言页启用，文章不受影响。默认 false 兼容原设置。 */
+	guestbookOnly?: boolean;
+	/** 本地试用时设为 true，生产构建不加载评论。 */
+	localOnly?: boolean;
+	waline?: WalineConfig;
 	/** Twikoo 专属配置 */
 	twikoo: TwikooConfig;
 	/** Giscus 专属配置 */

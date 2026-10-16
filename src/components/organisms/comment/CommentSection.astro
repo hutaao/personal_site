@@ -15,7 +15,7 @@ interface Props {
 const { context, postCommentEnabled = true, class: className } = Astro.props;
 const options = resolveCommentOptions(commentConfig);
 
-if (!options || !postCommentEnabled) {
+if (!options || !postCommentEnabled || (commentConfig.guestbookOnly && context.key !== "page:guestbook")) {
 	return null;
 }
 
@@ -28,6 +28,8 @@ const Giscus =
 	options.provider === "giscus"
 		? (await import("@components/organisms/comment/Giscus.astro")).default
 		: null;
+const Waline = options.provider === "waline"
+	? (await import("@components/organisms/comment/Waline.astro")).default : null;
 ---
 
 <section
@@ -58,6 +60,9 @@ const Giscus =
 				config={options.giscus}
 				lazy={options.lazy}
 			/>
+		)}
+		{options.provider === "waline" && Waline && (
+			<Waline context={context} config={options.waline} lazy={options.lazy} />
 		)}
 	</Card>
 </section>

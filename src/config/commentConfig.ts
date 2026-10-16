@@ -2,6 +2,7 @@ import type {
 	CommentConfig,
 	GiscusConfig,
 	TwikooConfig,
+	WalineConfig,
 } from "@/types/commentConfig";
 import { withUserConfig } from "../utils/config-overlay.ts";
 
@@ -35,6 +36,13 @@ export const commentConfig: CommentConfig = withUserConfig("comment", {
 	provider: "none",
 	/** 是否开启视口懒加载：滚动进入视口才动态加载评论组件（推荐 true） */
 	lazy: true,
+	guestbookOnly: false,
+	localOnly: false,
+	waline: {
+		serverURL: "",
+		lang: "zh-CN",
+		placeholder: "欢迎留言，分享你的想法和建议。",
+	},
 	/** Twikoo 专有配置 */
 	twikoo: {
 		/** Twikoo 环境 ID（如 "https://your-twikoo.vercel.app" 或腾讯云环境 ID） */
@@ -76,6 +84,7 @@ export const commentConfig: CommentConfig = withUserConfig("comment", {
 });
 
 export type ResolvedCommentOptions =
+	| { provider: "waline"; lazy: boolean; waline: WalineConfig }
 	| {
 			provider: "twikoo";
 			lazy: boolean;
@@ -95,8 +104,20 @@ export type ResolvedCommentOptions =
 export function resolveCommentOptions(
 	config: CommentConfig,
 ): ResolvedCommentOptions {
-	if (!config.enable || config.provider === "none") {
+	if (!config.enable || config.provider === "none" || (config.localOnly && import.meta.env.PROD)) {
 		return null;
+	}
+	if (config.provider === "waline") {
+		const serverURL = config.waline?.serverURL?.trim().replace(/\/$/, "");
+		if (!serverURL) return null;
+		try {
+			const parsed = new URL(serverURL);
+			if (!["http:", "https:"].includes(parsed.protocol) || parsed.username || parsed.password) return null;
+		} catch { return null; }
+		return {
+			provider: "waline", lazy: config.lazy,
+			waline: { ...config.waline!, serverURL },
+		};
 	}
 	if (config.provider === "twikoo") {
 		const envId = config.twikoo.envId?.trim();

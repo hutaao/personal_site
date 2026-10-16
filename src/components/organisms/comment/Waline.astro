@@ -1,0 +1,162 @@
+---
+import "@waline/client/waline.css";
+import type { CommentContext, WalineConfig } from "@/types/commentConfig";
+
+interface Props { context: CommentContext; config: WalineConfig; lazy?: boolean; }
+const { context, config, lazy = true } = Astro.props;
+---
+<div class="shirone-waline" data-waline data-server-url={config.serverURL}
+  data-comment-path={context.key} data-language={config.lang}
+  data-placeholder={config.placeholder} data-lazy={String(lazy)}
+  data-emoji={JSON.stringify(config.emoji ?? false)} data-image-uploader={String(config.imageUploader ?? false)}
+  data-image-storage={config.imageStorage ?? "inline"}>
+  <p data-waline-loading role="status">正在加载留言区…</p>
+  <p class="waline-meta-help">昵称、邮箱和网址均选填；邮箱用于匹配头像，不填也可以留言。</p>
+  {config.imageUploader && <p class="waline-meta-help">原图最多 5 MB，自动缩小压缩；动图需在 300 KB 以内、长边不超过 1600 像素。</p>}
+  <div class="waline-mount"></div>
+  <div data-waline-error hidden role="alert">
+    留言区暂时未能加载。<button type="button" data-waline-retry>重试</button>
+  </div>
+  <noscript>启用 JavaScript 后可以查看和发送留言。</noscript>
+</div>
+
+<script>
+  import type { WalineInstance } from "@waline/client";
+  import { prepareCommentImage, uploadCommentImage } from "@/utils/comment-image-upload";
+
+  type MountState = { instance?: WalineInstance; observer?: IntersectionObserver; avatarAbort?: AbortController; cancelled: boolean; started?: boolean };
+  const mounts = new Map<HTMLElement, MountState>();
+  const fallbackAvatar = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><rect width="48" height="48" rx="24" fill="#e5edf0"/><circle cx="24" cy="18" r="8" fill="#627d87"/><path d="M9 44v-5a15 15 0 0 1 30 0v5" fill="#627d87"/></svg>')}`;
+
+  function release(wrapper: HTMLElement, state: MountState) {
+    state.cancelled = true;
+    state.observer?.disconnect();
+    state.avatarAbort?.abort();
+    state.instance?.destroy();
+    mounts.delete(wrapper);
+  }
+
+  function setupWaline() {
+    for (const [wrapper, state] of mounts) {
+      if (!wrapper.isConnected) release(wrapper, state);
+    }
+    document.querySelectorAll<HTMLElement>("[data-waline]").forEach((wrapper) => {
+      if (mounts.has(wrapper)) return;
+      const target = wrapper.querySelector<HTMLElement>(".waline-mount");
+      if (!target || !wrapper.dataset.serverUrl) return;
+      const state: MountState = { cancelled: false };
+      state.avatarAbort = new AbortController();
+      target.addEventListener("error", (event) => {
+        const img = event.target;
+        if (img instanceof HTMLImageElement && img.matches(".wl-user-avatar") && img.src !== fallbackAvatar) {
+          img.src = fallbackAvatar;
+        }
+      }, { capture: true, signal: state.avatarAbort.signal });
+      mounts.set(wrapper, state);
+      const start = async () => {
+        if (state.started) return;
+        state.started = true;
+        state.observer?.disconnect();
+        try {
+          const { init } = await import("@waline/client");
+          if (state.cancelled || !wrapper.isConnected) return;
+          const instance = init({
+            el: target, serverURL: wrapper.dataset.serverUrl!,
+            // 使用稳定页面标识，避免本地和正式站的 base 路径导致串页或丢评论。
+            path: wrapper.dataset.commentPath,
+            lang: wrapper.dataset.language || "zh-CN",
+            locale: { placeholder: wrapper.dataset.placeholder || "欢迎留言。" },
+            meta: ["nick", "mail", "link"], requiredMeta: [], login: "disable",
+            dark: "html.dark", emoji: JSON.parse(wrapper.dataset.emoji || "false"),
+            imageUploader: wrapper.dataset.imageUploader === "true"
+              ? (file) => wrapper.dataset.imageStorage === "blob"
+                ? uploadCommentImage(file, wrapper.dataset.serverUrl!)
+                : prepareCommentImage(file)
+              : false,
+            search: false, reaction: false, pageview: false, comment: false,
+          });
+          if (state.cancelled || !wrapper.isConnected) { instance?.destroy(); return; }
+          if (!instance) throw new Error("Waline mount target is unavailable");
+          state.instance = instance;
+          target.querySelector<HTMLTextAreaElement>(".wl-editor")?.setAttribute("aria-label", "留言内容");
+          const upload = target.querySelector<HTMLElement>('label[for="wl-image-upload"]');
+          if (upload) {
+            // The SDK labels this native <label> with aria-label, which its
+            // implicit role does not permit. Keep a real text label instead.
+            upload.removeAttribute("aria-label");
+            const name = document.createElement("span");
+            name.className = "sr-only";
+            name.textContent = "上传图片";
+            upload.append(name);
+            upload.tabIndex = 0;
+            upload.onkeydown = (event) => {
+              if ((event.key === "Enter" || event.key === " ") && !event.repeat) {
+                event.preventDefault();
+                target.querySelector<HTMLInputElement>("#wl-image-upload")?.click();
+              }
+            };
+          }
+          wrapper.dataset.walineMounted = "true";
+          wrapper.querySelector<HTMLElement>("[data-waline-loading]")!.hidden = true;
+        } catch (error) {
+          if (state.cancelled || !wrapper.isConnected) return;
+          wrapper.querySelector<HTMLElement>("[data-waline-loading]")!.hidden = true;
+          wrapper.querySelector<HTMLElement>("[data-waline-error]")!.hidden = false;
+          console.error("[Waline] Initialization failed", error);
+        }
+      };
+      if (wrapper.dataset.lazy === "true" && "IntersectionObserver" in window) {
+        state.observer = new IntersectionObserver((entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) void start();
+        }, { rootMargin: "200px" });
+        state.observer.observe(wrapper);
+      } else void start();
+      wrapper.querySelector<HTMLButtonElement>("[data-waline-retry]")!.onclick = () => {
+        release(wrapper, state);
+        wrapper.querySelector<HTMLElement>("[data-waline-error]")!.hidden = true;
+        wrapper.querySelector<HTMLElement>("[data-waline-loading]")!.hidden = false;
+        setupWaline();
+      };
+    });
+  }
+
+  setupWaline();
+  document.addEventListener("swup:content:replace", setupWaline);
+  document.addEventListener("swup:page:view", setupWaline);
+  document.addEventListener("astro:before-swap", () => {
+    for (const [wrapper, state] of mounts) release(wrapper, state);
+  });
+</script>
+
+<style is:global>
+  .shirone-waline {
+    --waline-font-size: 1rem;
+    --waline-theme-color: var(--primary);
+    --waline-active-color: var(--on-primary-container);
+    --waline-color: var(--on-surface);
+    --waline-white: var(--on-primary);
+    --waline-light-grey: var(--on-surface-variant);
+    --waline-dark-grey: var(--on-surface-variant);
+    --waline-bg-color: var(--card-bg);
+    --waline-bg-color-light: var(--surface-container-low);
+    --waline-bg-color-hover: var(--surface-container);
+    --waline-border-color: var(--outline-variant);
+    --waline-disable-bg-color: var(--surface-container);
+    --waline-disable-color: var(--on-surface-variant);
+    --waline-info-bg-color: var(--surface-container);
+    --waline-info-color: var(--on-surface-variant);
+    --waline-bq-color: var(--surface-container-low);
+    --waline-border: 1px solid var(--outline-variant);
+    color: var(--on-surface);
+    font-family: inherit;
+  }
+  .shirone-waline [hidden] { display: none !important; }
+  .shirone-waline .wl-panel { border-radius: var(--shape-corner-m); }
+  .shirone-waline .wl-editor, .shirone-waline input, .shirone-waline button { font-family: inherit; }
+  .shirone-waline .wl-editor { min-height: 8rem; }
+  .shirone-waline .waline-meta-help { margin: 0 0 .75rem; font-size: .875rem; color: var(--on-surface-variant); }
+  .shirone-waline .wl-btn { border-radius: var(--shape-corner-s); }
+  .shirone-waline [data-waline-loading] { color: var(--on-surface-variant); }
+  .shirone-waline [data-waline-error] { color: var(--on-error-container); background: var(--error-container); padding: 1rem; border-radius: var(--shape-corner-m); }
+  .shirone-waline [data-waline-retry] { text-decoration: underline; margin-left: .5rem; cursor: pointer; }
+</style>

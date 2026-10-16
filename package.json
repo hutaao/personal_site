@@ -85,6 +85,7 @@
     "@swup/astro": "^1.8.0",
     "@tailwindcss/typography": "^0.5.20",
     "@tailwindcss/vite": "4",
+    "@waline/client": "3.16.1",
     "astro": "7.3.2",
     "astro-expressive-code": "^0.44.2",
     "astro-icon": "^1.2.0",

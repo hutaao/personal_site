@@ -5,6 +5,7 @@
  * - config/site.yaml
  * - config/profile.yaml
  * - config/license.yaml
+ * - config/comment.yaml
  * - config/announcement.yaml
  * - config/footer.yaml
  * - config/music.yaml
@@ -22,6 +23,7 @@
 import type { AboutConfig } from "@/types/aboutConfig";
 import type { AlbumsConfig } from "@/types/albumsConfig";
 import type { AnnouncementConfig } from "@/types/announcementConfig";
+import type { CommentConfig } from "@/types/commentConfig";
 import type { CompassConfig } from "@/types/compassConfig";
 import type { LicenseConfig, ProfileConfig, SiteConfig } from "@/types/config";
 import type { FooterConfig } from "@/types/footerConfig";
@@ -181,12 +183,30 @@ const compass: DeepPartial<CompassConfig> = {
 	description: "$t:compassBanner",
 };
 
+// config/comment.yaml
+const comment: DeepPartial<CommentConfig> = {
+	enable: true,
+	provider: "waline",
+	guestbookOnly: true,
+	localOnly: false,
+	lazy: true,
+	waline: {
+		serverURL: "https://hutaao-waline.vercel.app",
+		lang: "zh-CN",
+		placeholder: "欢迎留言，昵称可选，无需填写邮箱。",
+		emoji: ["https://unpkg.com/@waline/emojis@1.1.0/weibo"],
+		imageUploader: true,
+		imageStorage: "blob",
+	},
+};
+
 /** 领域名 -> 该领域的用户覆盖值（仅包含用户显式声明的键）。 */
 export const userConfigOverrides: Readonly<Record<string, unknown>> = {
 	site,
 	profile,
 	license,
 	announcement,
+	comment,
 	footer,
 	music,
 	umami,
@@ -203,6 +223,7 @@ export const userConfigSources: readonly string[] = [
 	"config/profile.yaml",
 	"config/license.yaml",
 	"config/announcement.yaml",
+	"config/comment.yaml",
 	"config/footer.yaml",
 	"config/music.yaml",
 	"config/umami.yaml",
