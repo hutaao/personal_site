@@ -2,7 +2,7 @@
  * 内容物化：把内容仓库的目录同步到代码仓的标准路径，之后构建链保持完全不变。
  *
  * 设计要点见 `docs/content-separation/README.md`：
- * - `local` 模式下本脚本是空操作，主题自带内容的行为不受任何影响；
+ * - `local` 模式不物化内容，仅检查相册图片是否需要自动压缩；
  * - 采用「物化」而非让 Astro 直读内容仓，是因为 `import.meta.glob` 的静态基准是 `src/`，
  *   且 `astro.config.mjs` 会在 Vite 插件链生效前同步 import 配置；
  * - 裁剪按「顶层段」限定，只清理内容仓确实拥有的那部分目录，
@@ -27,6 +27,7 @@ import {
 	writeFileSync,
 } from "node:fs";
 import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { CONFIG_DIRECTORY } from "./config-domains.mjs";
 import { syncUserConfig } from "./config-overlay.mjs";
 import {
@@ -420,15 +421,31 @@ function readPreviousConfigFiles() {
 	}
 }
 
+function compressAlbumDirectory(directory) {
+	if (options.dryRun || !existsSync(directory)) return;
+	execFileSync(process.execPath, [fileURLToPath(new URL("../images/compress-albums.mjs", import.meta.url)), directory], {
+		cwd: ROOT,
+		stdio: options.quiet ? ["ignore", "ignore", "inherit"] : "inherit",
+		env: process.env,
+	});
+}
+
 function runSync() {
 	const resolved = resolveContentSource(ROOT);
 	if (resolved.mode === "local") {
-		// 主题自带内容：保持静默，`pnpm dev` / `pnpm build` 的输出不受影响。
+		compressAlbumDirectory(join(ROOT, "public/images/albums"));
 		return null;
 	}
 
 	const previousConfigFiles = readPreviousConfigFiles();
 	const { directory: sourceRoot, commit } = resolveSourceRoot(resolved);
+	// Optimize the local writing source before copying so a later sync cannot restore originals.
+	// CI and remote checkouts only optimize the materialized build files below.
+	if (resolved.source.type === "path" && (!process.env.CI || process.env.CI === "false")) {
+		for (const [sourceDir, targetDir] of Object.entries(resolved.mounts)) {
+			if (targetDir === "public") compressAlbumDirectory(join(sourceRoot, sourceDir, "images/albums"));
+		}
+	}
 	warnUnmountedDirectories(sourceRoot, resolved.mounts);
 
 	const mountStats = {};
@@ -446,6 +463,7 @@ function runSync() {
 		totalCopied += stats.copied;
 		totalRemoved += stats.removed;
 	}
+	compressAlbumDirectory(join(ROOT, "public/images/albums"));
 
 	// 配置覆盖必须在挂载之后：类型校验会读到内容仓刚物化过来的 src/data/*.ts。
 	const config = syncUserConfig({

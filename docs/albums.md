@@ -32,4 +32,14 @@ Protected albums use the same `layout` and `columns` contract as regular albums.
 
 Images used in albums must have an appropriate source and permission. Album metadata and the website's code license do not grant rights to third-party images.
 
+## Automatic local image optimization
+
+The existing `npm.cmd run build`, `npm.cmd run dev` and `npm.cmd run content:sync` commands automatically optimize local album photos before use. Keep using the same folders, filenames and `git add` / `git commit` / `git push` publishing steps. Run the build before `git add` so the optimized files, rather than the camera originals, enter the commit. This does not rewrite photos already uploaded in earlier Git commits.
+
+Static JPEG, WebP and PNG photos larger than 2560 pixels on their longest edge are resized without cropping or upscaling. JPEG and WebP use quality 85; PNG uses lossless compression. EXIF orientation is applied before metadata is removed. Images already within the size limit and without EXIF, XMP, IPTC or orientation metadata are left byte-for-byte unchanged, avoiding repeated lossy encoding. GIF and multi-frame WebP/APNG files are left unchanged. Album metadata, cover filenames, sort order and protected-album settings stay the same; no thumbnail directory is added.
+
+Before replacing a local original, the script writes and verifies a SHA-256-named backup under `~/Documents/博客备份/相册原图/自动备份/`. Reusing a photo filename therefore cannot overwrite an earlier backup. The backup contains only image bytes and sits outside the public repository. Set `ALBUM_BACKUP_ROOT` to another absolute directory when needed (for example, a temporary directory in tests). A failed backup stops the operation before that image is replaced.
+
+For a local writing content source, photos are optimized in the source first and then copied to the main project, so later synchronization cannot restore the large originals. In CI (`CI=true`) and remote Git content sources, only the materialized project copy is optimized; CI creates no personal backup and does not alter the writing source. `content:validate` / `--dry-run` do not optimize photos. External image URLs remain untouched.
+
 After changing an album's `info.json` or image files, run `npx.cmd playwright test tests/site/albums.spec.ts` from the project root.
