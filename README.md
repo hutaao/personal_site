@@ -1,6 +1,6 @@
 # hutaao-blog
 
-hutaao 的个人博客，用于整理技术学习笔记，也记录日常想法和生活片段。
+hutaao 的个人博客网站，用于整理技术学习笔记，同时发布一些日常
 
 **访问网站：[hutaao.github.io/personal_site](https://hutaao.github.io/personal_site/)**
 
