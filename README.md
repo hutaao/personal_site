@@ -1,6 +1,6 @@
 # hutaao-blog
 
-hutaao 的个人博客，用于整理技术学习、编程实践与研究笔记，也记录日常想法和生活片段。希望把零散的探索整理成可以回顾、交流的内容。
+hutaao 的个人博客，用于整理技术学习笔记，也记录日常想法和生活片段。
 
 **访问网站：[hutaao.github.io/personal_site](https://hutaao.github.io/personal_site/)**
 
@@ -23,7 +23,7 @@ hutaao 的个人博客，用于整理技术学习、编程实践与研究笔记�
 
 ## 本仓库
 
-这里保存网站源码与公开内容，网站通过 GitHub Pages 发布。开发环境、目录说明和维护方法见 [项目维护指南](docs/maintenance.md)，其他技术资料见 [文档索引](docs/README.md)。
+这里保存网站源码与公开内容，网站通过 GitHub Pages 发布。
 
 ## 来源与许可
 
