@@ -41,7 +41,7 @@ async function ready(page: Page, theme: "light" | "dark", mock = true, brokenAva
 }
 
 for (const theme of ["light", "dark"] as const) {
-		test(`Waline ${theme}: optional profile fields, avatar and upload, no visitor login or tracking controls`, async ({ page }) => {
+		test(`Waline ${theme}: required nickname, optional contact fields, avatar and upload, no visitor login or tracking controls`, async ({ page }) => {
 		await ready(page, theme);
 		await expect(page.locator("html")).toHaveClass(theme === "dark" ? /dark/ : /^(?!.*\bdark\b)/);
 		const comments = page.locator(".shirone-waline");
@@ -49,7 +49,7 @@ for (const theme of ["light", "dark"] as const) {
     for (const field of ["nick", "mail", "link"]) {
       const input = comments.locator(`input[name="${field}"]`);
       await expect(input).toBeVisible();
-      expect(await input.evaluate((element: HTMLInputElement) => element.required)).toBe(false);
+      expect(await input.evaluate((element: HTMLInputElement) => element.required)).toBe(field === "nick");
     }
     const avatar = comments.locator('img[src="https://avatar.test/visitor.svg"]');
     await expect(avatar).toBeVisible();
@@ -73,7 +73,7 @@ for (const theme of ["light", "dark"] as const) {
 	});
 }
 
-test("Waline: narrow layout, avatar failure fallback and anonymous optional fields", async ({ page }) => {
+test("Waline: narrow layout, avatar failure fallback and required nickname and optional contact fields", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await ready(page, "light", true, true);
   const comments = page.locator(".shirone-waline");
@@ -91,6 +91,7 @@ test("Waline: narrow layout, avatar failure fallback and anonymous optional fiel
     } } });
   });
   for (const field of ["nick", "mail", "link"]) await comments.locator(`input[name="${field}"]`).fill("");
+  await comments.locator(`input[name="nick"]`).fill("访客");
   await comments.locator(".wl-editor").fill("anonymous fixture");
   await comments.getByRole("button", { name: "提交", exact: true }).click();
   await expect.poll(() => Boolean(submitted)).toBe(true);

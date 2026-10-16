@@ -11,7 +11,7 @@ const { context, config, lazy = true } = Astro.props;
   data-emoji={JSON.stringify(config.emoji ?? false)} data-image-uploader={String(config.imageUploader ?? false)}
   data-image-storage={config.imageStorage ?? "inline"}>
   <p data-waline-loading role="status">正在加载留言区…</p>
-  <p class="waline-meta-help">昵称、邮箱和网址均选填；邮箱用于匹配头像及接收评论回复通知（通知功能暂未开启），邮箱地址不会公开展示。</p>
+  <p class="waline-meta-help">昵称必填，邮箱和网址选填；邮箱用于匹配头像及接收评论回复通知（通知功能暂未开启），邮箱地址不会公开展示。</p>
   {config.imageUploader && <p class="waline-meta-help">原图最多 5 MB，自动缩小压缩；动图需在 300 KB 以内、长边不超过 1600 像素。</p>}
   <div class="waline-mount"></div>
   <div data-waline-error hidden role="alert">
@@ -24,7 +24,7 @@ const { context, config, lazy = true } = Astro.props;
   import type { WalineInstance } from "@waline/client";
   import { prepareCommentImage, uploadCommentImage } from "@/utils/comment-image-upload";
 
-  type MountState = { instance?: WalineInstance; observer?: IntersectionObserver; avatarAbort?: AbortController; cancelled: boolean; started?: boolean };
+  type MountState = { instance?: WalineInstance; observer?: IntersectionObserver; avatarAbort?: AbortController; badgeObserver?: MutationObserver; cancelled: boolean; started?: boolean };
   const mounts = new Map<HTMLElement, MountState>();
   const fallbackAvatar = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><rect width="48" height="48" rx="24" fill="#e5edf0"/><circle cx="24" cy="18" r="8" fill="#627d87"/><path d="M9 44v-5a15 15 0 0 1 30 0v5" fill="#627d87"/></svg>')}`;
 
@@ -32,8 +32,27 @@ const { context, config, lazy = true } = Astro.props;
     state.cancelled = true;
     state.observer?.disconnect();
     state.avatarAbort?.abort();
+    state.badgeObserver?.disconnect();
     state.instance?.destroy();
     mounts.delete(wrapper);
+  }
+
+  // The SDK renders this icon only for the server's administrator identity.
+  // Never infer ownership from a visitor-supplied nickname, email or label.
+  function updateOwnerBadges(target: HTMLElement) {
+    target.querySelectorAll<HTMLElement>(".wl-card > .wl-head").forEach((head) => {
+      const owner = Boolean(head.parentElement?.previousElementSibling?.querySelector(".administrator-icon"));
+      const badge = head.querySelector<HTMLElement>("[data-owner-badge]");
+      if (!owner) { badge?.remove(); return; }
+      if (badge) return;
+      const nick = head.querySelector(".wl-nick");
+      if (!nick) return;
+      const mark = document.createElement("span");
+      mark.className = "waline-owner-badge";
+      mark.dataset.ownerBadge = "true";
+      mark.textContent = "博主";
+      nick.after(mark);
+    });
   }
 
   function setupWaline() {
@@ -65,8 +84,8 @@ const { context, config, lazy = true } = Astro.props;
             // 使用稳定页面标识，避免本地和正式站的 base 路径导致串页或丢评论。
             path: wrapper.dataset.commentPath,
             lang: wrapper.dataset.language || "zh-CN",
-            locale: { placeholder: wrapper.dataset.placeholder || "欢迎留言。" },
-            meta: ["nick", "mail", "link"], requiredMeta: [], login: "disable",
+            locale: { nick: "昵称（必填）", placeholder: wrapper.dataset.placeholder || "欢迎留言。" },
+            meta: ["nick", "mail", "link"], requiredMeta: ["nick"], login: "disable",
             dark: "html.dark", emoji: JSON.parse(wrapper.dataset.emoji || "false"),
             imageUploader: wrapper.dataset.imageUploader === "true"
               ? (file) => wrapper.dataset.imageStorage === "blob"
@@ -78,6 +97,11 @@ const { context, config, lazy = true } = Astro.props;
           if (state.cancelled || !wrapper.isConnected) { instance?.destroy(); return; }
           if (!instance) throw new Error("Waline mount target is unavailable");
           state.instance = instance;
+          const nickInput = target.querySelector<HTMLInputElement>('input[name="nick"]');
+          if (nickInput) { nickInput.required = true; nickInput.setAttribute("aria-required", "true"); }
+          state.badgeObserver = new MutationObserver(() => updateOwnerBadges(target));
+          state.badgeObserver.observe(target, { childList: true, subtree: true });
+          updateOwnerBadges(target);
           target.querySelector<HTMLTextAreaElement>(".wl-editor")?.setAttribute("aria-label", "留言内容");
           const upload = target.querySelector<HTMLElement>('label[for="wl-image-upload"]');
           if (upload) {
@@ -155,6 +179,15 @@ const { context, config, lazy = true } = Astro.props;
   .shirone-waline .wl-editor, .shirone-waline input, .shirone-waline button { font-family: inherit; }
   .shirone-waline .wl-editor { min-height: 8rem; }
   .shirone-waline .waline-meta-help { margin: 0 0 .75rem; font-size: .875rem; color: var(--on-surface-variant); }
+  .shirone-waline .waline-owner-badge {
+    display: inline-flex; align-items: center; margin-inline-start: .4rem;
+    padding: .1rem .4rem; border-radius: .25rem;
+    font-size: .75rem; font-weight: 500; line-height: 1.4;
+    color: #24752d; background: #e8f6e9; border: 1px solid #c4e9c7;
+  }
+  html.dark .shirone-waline .waline-owner-badge {
+    color: #a5e8ad; background: #183d23; border-color: #376344;
+  }
   .shirone-waline .wl-btn { border-radius: var(--shape-corner-s); }
   .shirone-waline [data-waline-loading] { color: var(--on-surface-variant); }
   .shirone-waline [data-waline-error] { color: var(--on-error-container); background: var(--error-container); padding: 1rem; border-radius: var(--shape-corner-m); }

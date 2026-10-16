@@ -139,7 +139,7 @@ const comment: DeepPartial<CommentConfig> = {
 	waline: {
 		serverURL: "https://hutaao-waline.vercel.app",
 		lang: "zh-CN",
-		placeholder: "欢迎留言，昵称可选，无需填写邮箱。",
+		placeholder: "欢迎留言，请填写昵称；邮箱和网址选填。",
 		emoji: [
 			"https://unpkg.com/@waline/emojis@1.1.0/weibo",
 		],
