@@ -465,7 +465,7 @@ function setVolume(event: Event): void {
 <style>
 .music-player__lyrics { padding: .5rem .25rem; text-align: center; min-height: 5rem; }
 .music-player__lyrics p { margin: .2rem 0; line-height: 1.5; overflow-wrap: anywhere; }
-.music-player__lyric-adjacent { font-size: .75rem; opacity: .55; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.music-player__lyric-adjacent { font-size: .75rem; color: var(--on-surface-variant); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 .music-player__lyric-current { font-size: .85rem; font-weight: 600; }
 .music-player__floating-settings { display: flex; gap: .25rem; justify-content: flex-end; }
 </style>

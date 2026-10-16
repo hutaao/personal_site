@@ -8,9 +8,10 @@ import sharp from "sharp";
  *
  * 语法：`![图片描述 w-50%](图片链接 "图片标题")`
  * - `w-N%`（1~100）写在 alt 文本中，解析后从 alt 移除并作为显示宽度（居中）；
+ * - alt 末尾 `|400` / `|400x300` 兼容 Obsidian，网页保留比例；与 w-N% 并存时网页优先百分比；
  * - `"图片标题"` 渲染为图片下方的可见图注；
- * - 独立成段的图片在带标题或宽度令牌时包装为 `<figure>`，否则仅补齐
- *   `loading="lazy"` / `decoding="async"`，不改变既有排版。
+ * - 独立成段的图片在带标题或尺寸令牌时包装为 `<figure>`；普通图由正文 CSS
+ *   限制默认视觉尺寸，并统一补齐 `loading="lazy"` / `decoding="async"`。
  * - 原始 HTML `<img>` 使用同一套规则；匹配配置域名时补充
  *   `referrerpolicy="no-referrer"`。
  *
@@ -86,12 +87,16 @@ export function matchesNoReferrerDomain(url, patterns = []) {
  * 解析可选的 `w-N%` 宽度令牌；非法值（越界/格式错误）保留在 alt 中。
  *
  * @param {unknown} value alt 原始值。
- * @returns {{ alt: string, width?: number }}
+ * `|400` / `|400x300` 为 Obsidian 兼容尺寸；与百分比并存时网页优先百分比，
+ * Obsidian 仍读取末尾像素尺寸。网页始终保留图片比例。
+ * @returns {{ alt: string, width?: number, pixelWidth?: number, pixelHeight?: number }}
  */
 export function parseMarkdownImageAlt(value) {
 	const alt = typeof value === "string" ? value : String(value ?? "");
+	const pixelSuffix = /\|([1-9]\d{0,4})(?:x([1-9]\d{0,4}))?\s*$/.exec(alt);
+	const source = pixelSuffix ? alt.slice(0, pixelSuffix.index) : alt;
 	let width;
-	const cleaned = alt.replace(WIDTH_TOKEN, (token, rawWidth) => {
+	const cleaned = source.replace(WIDTH_TOKEN, (token, rawWidth) => {
 		const candidate = Number.parseInt(rawWidth, 10);
 		if (width === undefined && candidate >= 1 && candidate <= 100) {
 			width = candidate;
@@ -103,6 +108,10 @@ export function parseMarkdownImageAlt(value) {
 	return {
 		alt: cleaned.replace(/\s{2,}/g, " ").trim(),
 		width,
+		...(pixelSuffix ? {
+			pixelWidth: Number(pixelSuffix[1]),
+			...(pixelSuffix[2] ? { pixelHeight: Number(pixelSuffix[2]) } : {}),
+		} : {}),
 	};
 }
 
@@ -198,16 +207,24 @@ async function enhanceImage(image, ancestors, allowFigure, options, filePath) {
 	const parsedAlt = parseMarkdownImageAlt(properties.alt);
 	properties.alt = parsedAlt.alt;
 	if (parsedAlt.width !== undefined) {
+		properties.dataImageSize = "explicit";
 		properties.style = appendStyle(
 			properties.style,
 			`width: ${parsedAlt.width}%; display: block; margin-inline: auto;`,
 		);
+	} else if (parsedAlt.pixelWidth !== undefined) {
+		properties.dataImageSize = "explicit";
+		const size = parsedAlt.pixelHeight === undefined
+			? `width: ${parsedAlt.pixelWidth}px;`
+			: `width: auto; max-width: min(100%, ${parsedAlt.pixelWidth}px); max-height: ${parsedAlt.pixelHeight}px;`;
+		properties.style = appendStyle(properties.style,
+			`${size} height: auto; object-fit: contain; display: block; margin-inline: auto;`);
 	}
 
 	const title =
 		typeof properties.title === "string" ? properties.title.trim() : "";
 	// figure 包装仅限独立成段的图片；混排文本中的图片包 figure 会产生无效嵌套
-	return allowFigure && (title || parsedAlt.width !== undefined)
+	return allowFigure && (title || parsedAlt.width !== undefined || parsedAlt.pixelWidth !== undefined)
 		? createFigure(image, title)
 		: image;
 }

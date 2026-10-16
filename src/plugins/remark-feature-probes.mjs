@@ -7,6 +7,7 @@ import { getBilibiliEmbedData } from "./markdown/core/bilibili.mjs";
 import { getYouTubeEmbedData } from "./markdown/core/youtube.mjs";
 
 const IMAGE_PRESENTATION_WIDTH_TOKEN = /(?:^|\s)w-(?:[1-9]\d?|100)%(?=\s|$)/;
+const IMAGE_PRESENTATION_PIXEL_SUFFIX = /\|[1-9]\d{0,4}(?:x[1-9]\d{0,4})?\s*$/;
 
 function getDirectiveLabel(children = []) {
 	return children
@@ -134,7 +135,8 @@ export function remarkFeatureProbes() {
 				parent?.type === "paragraph" &&
 				parent.children.length === 1 &&
 				(Boolean(node.title?.trim()) ||
-					IMAGE_PRESENTATION_WIDTH_TOKEN.test(node.alt ?? ""))
+					IMAGE_PRESENTATION_WIDTH_TOKEN.test(node.alt ?? "") ||
+					IMAGE_PRESENTATION_PIXEL_SUFFIX.test(node.alt ?? ""))
 			) {
 				syntaxes.add("image-presentation");
 			}

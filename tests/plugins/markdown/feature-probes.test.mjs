@@ -144,6 +144,10 @@ test("records standalone image presentations without matching inline images", as
 	const inlineImage = await renderer.render(
 		'Inline ![Example w-50%](/images/example.webp "Caption") text.',
 	);
+	for (const alt of ["Example|400", "Example|400x300", "Example w-50%|400"]) {
+		const sized = await renderer.render(`![${alt}](/images/example.webp)`);
+		assert.deepEqual(sized.metadata.frontmatter.markdownSyntaxes.syntaxes, ["image-presentation"]);
+	}
 	assert.deepEqual(
 		inlineImage.metadata.frontmatter.markdownSyntaxes.syntaxes,
 		[],

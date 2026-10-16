@@ -13,14 +13,13 @@ interface Props {
 }
 const className = Astro.props.class;
 const style = Astro.props.style;
-const contentText = config.content || config.text || "";
+const contentText = (config.content || config.text || "").trim();
 const link = config.link;
 const hasLink = link && link.enable !== false && link.text && link.url;
 const isExternal =
 	hasLink &&
 	(link.external === true ||
 		(/^https?:\/\//i.test(link.url) && link.external !== false));
-const closeDuration = Number(config.closeDuration ?? 86400);
 ---
 
 <!-- 组件显示由 sidebarConfig 统一控制；空公告保留板块。 -->
@@ -31,14 +30,14 @@ const closeDuration = Number(config.closeDuration ?? 86400);
 		class={className}
 		style={style}
 	>
-		<div class="announcement-wrapper flex flex-col" data-close-duration={String(closeDuration)}>
+		<div class="announcement-wrapper flex flex-col">
 			<!-- 公告栏内容 -->
 			<div class="announcement-content">
 				{contentText}
 			</div>
 
-			<!-- 可选链接和关闭按钮 -->
-			{(hasLink || (contentText && config.closable)) && (
+			<!-- 可选链接 -->
+			{hasLink && (
 				<div class="announcement-actions">
 					<div>
 						{hasLink && (
@@ -59,17 +58,6 @@ const closeDuration = Number(config.closeDuration ?? 86400);
 						)}
 					</div>
 
-					{config.closable && (
-						<button
-							type="button"
-							class="announcement-close-btn m3-state-layer"
-							onclick="closeAnnouncement()"
-							aria-label={i18n(I18nKey.announcementClose)}
-							title={i18n(I18nKey.announcementClose)}
-						>
-							<Icon name="material-symbols:close-rounded" class="announcement-close-btn__icon" />
-						</button>
-					)}
 				</div>
 			)}
 		</div>
@@ -78,15 +66,17 @@ const closeDuration = Number(config.closeDuration ?? 86400);
 
 <style lang="stylus">
 .announcement-content
-	min-height: var(--m3e-space-12)
-	font: var(--m3e-type-body-medium)
+	font: var(--m3e-type-body-large)
+	font-size: 1.125rem
 	color: var(--on-surface-variant)
-	line-height: 1.6
-	margin-bottom: var(--m3e-space-3)
+	line-height: 1.7
+	margin: 0
 	word-break: break-word
 	white-space: pre-line
+	overflow-wrap: anywhere
 
 .announcement-actions
+	margin-top: var(--m3e-space-3)
 	display: flex
 	align-items: center
 	justify-content: space-between
@@ -112,110 +102,26 @@ const closeDuration = Number(config.closeDuration ?? 86400);
 		height: 1rem
 		opacity: 0.8
 
-.announcement-close-btn
-	display: flex
-	align-items: center
-	justify-content: center
-	width: 2rem
-	height: 2rem
-	border-radius: var(--shape-corner-full)
-	background: var(--btn-regular-bg)
-	color: var(--on-surface-variant)
-	cursor: pointer
-	border: none
-	--m3e-state-color: var(--error)
-	transition:
-		color var(--m3e-duration-short) var(--m3e-easing-standard),
-		background-color var(--m3e-duration-short) var(--m3e-easing-standard)
-
-	&:hover
-		color: var(--error)
-		background: var(--error-container)
-
-	&__icon
-		width: 1.125rem
-		height: 1.125rem
 </style>
 
 <script>
-	const STORAGE_KEY_CLOSED = "announcementClosed";
-	const STORAGE_KEY_TIME = "announcementClosedTime";
-
-	function isAnnouncementExpired(durationSeconds: number): boolean {
-		if (Number.isNaN(durationSeconds) || durationSeconds <= 0) {
-			return false;
+	// Migrate old dismissal records without changing the sidebar's page visibility rules.
+	function restoreAnnouncement() {
+		try {
+			localStorage.removeItem("announcementClosed");
+			localStorage.removeItem("announcementClosedTime");
+		} catch {
+			// Storage may be disabled; the announcement should remain visible anyway.
 		}
-		const closedTime = localStorage.getItem(STORAGE_KEY_TIME);
-		if (!closedTime) {
-			return true;
-		}
-		const elapsedSeconds = (Date.now() - Number(closedTime)) / 1000;
-		return elapsedSeconds > durationSeconds;
+		document.querySelectorAll<HTMLElement>('widget-layout[data-id="announcement"]').forEach(widget => {
+			(widget.closest<HTMLElement>(".sidebar-widget") || widget).style.removeProperty("display");
+			widget.style.removeProperty("display");
+		});
 	}
-
-	function closeAnnouncement() {
-		const widgetLayouts = document.querySelectorAll<HTMLElement>(
-			'widget-layout[data-id="announcement"]',
-		);
-		if (widgetLayouts.length > 0) {
-			widgetLayouts.forEach((widget) => {
-				const container = widget.closest<HTMLElement>(".sidebar-widget") || widget;
-				container.style.display = "none";
-			});
-			localStorage.setItem(STORAGE_KEY_CLOSED, "true");
-			localStorage.setItem(STORAGE_KEY_TIME, Date.now().toString());
-		}
-	}
-
-	function checkAnnouncementClosed() {
-		if (!document.querySelector(".announcement-content")?.textContent?.trim()) return;
-		const widgetLayouts = document.querySelectorAll<HTMLElement>(
-			'widget-layout[data-id="announcement"]',
-		);
-		if (widgetLayouts.length === 0) return;
-
-		const wrapper = document.querySelector<HTMLElement>(".announcement-wrapper");
-		const durationAttr = wrapper?.getAttribute("data-close-duration");
-		const durationSeconds = durationAttr ? Number.parseFloat(durationAttr) : 86400;
-
-		const isClosed = localStorage.getItem(STORAGE_KEY_CLOSED) === "true";
-		if (!isClosed) {
-			widgetLayouts.forEach((widget) => {
-				const container = widget.closest<HTMLElement>(".sidebar-widget") || widget;
-				container.style.display = "";
-				widget.style.display = "";
-			});
-			return;
-		}
-
-		if (isAnnouncementExpired(durationSeconds)) {
-			localStorage.removeItem(STORAGE_KEY_CLOSED);
-			localStorage.removeItem(STORAGE_KEY_TIME);
-			widgetLayouts.forEach((widget) => {
-				const container = widget.closest<HTMLElement>(".sidebar-widget") || widget;
-				container.style.display = "";
-				widget.style.display = "";
-			});
-		} else {
-			widgetLayouts.forEach((widget) => {
-				const container = widget.closest<HTMLElement>(".sidebar-widget") || widget;
-				container.style.display = "none";
-			});
-		}
-	}
-
 	if (document.readyState === "loading") {
-		document.addEventListener("DOMContentLoaded", checkAnnouncementClosed);
+		document.addEventListener("DOMContentLoaded", restoreAnnouncement, { once: true });
 	} else {
-		checkAnnouncementClosed();
+		restoreAnnouncement();
 	}
-
-	document.addEventListener("swup:content:replace", checkAnnouncementClosed);
-
-	const globalObj = window as unknown as {
-		closeAnnouncement: () => void;
-		checkAnnouncementClosed: () => void;
-	};
-	globalObj.closeAnnouncement = closeAnnouncement;
-	globalObj.checkAnnouncementClosed = checkAnnouncementClosed;
+	document.addEventListener("swup:content:replace", restoreAnnouncement);
 </script>

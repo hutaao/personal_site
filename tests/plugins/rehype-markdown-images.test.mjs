@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
-import { test } from "node:test";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { pathToFileURL } from "node:url";
+import { after, test } from "node:test";
 
 import {
 	matchesNoReferrerDomain,
@@ -9,6 +12,12 @@ import { siteMarkdownProcessor } from "../../src/utils/markdown-processor.mjs";
 
 // unified() 返回配置型处理器，需经 createRenderer 取得真正的渲染器（与 Astro 构建期同一条插件链）
 const renderer = await siteMarkdownProcessor.createRenderer({});
+// This test owns its tiny fixture; deleting demo albums must not break it.
+const fixtureRoot = await mkdtemp(path.resolve("public/.markdown-image-test-"));
+await writeFile(path.join(fixtureRoot, "pixel.png"), Buffer.from(
+	"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl6ZQAAAABJRU5ErkJggg==", "base64",
+));
+after(() => rm(fixtureRoot, { recursive: true, force: true }));
 
 /**
  * 将 Markdown 处理为 HTML 字符串。
@@ -17,11 +26,13 @@ const renderer = await siteMarkdownProcessor.createRenderer({});
  * @returns {Promise<string>}
  */
 async function render(markdown) {
-	const { code } = await renderer.render(markdown);
+	const { code } = await renderer.render(markdown, {
+		fileURL: pathToFileURL(path.join(fixtureRoot, "note.md")),
+	});
 	return code;
 }
 
-const IMAGE = "/images/albums/AcgExample/01.webp";
+const IMAGE = `/${path.basename(fixtureRoot)}/pixel.png`;
 
 test("parses the w-N% width token out of alt text", () => {
 	assert.deepEqual(parseMarkdownImageAlt("A demo image w-50%"), {
@@ -83,6 +94,24 @@ test("width token alone produces a figure without caption", async () => {
 	assert.match(html, /<figure class="markdown-image-figure">/);
 	assert.match(html, /width: 30%;/);
 	assert.doesNotMatch(html, /markdown-image-caption/);
+});
+
+test("Obsidian pixel suffix works alone and alongside web percentage", async () => {
+	assert.deepEqual(parseMarkdownImageAlt("说明 w-50%|400"), {
+		alt: "说明", width: 50, pixelWidth: 400,
+	});
+	const percentage = await render(`![说明 w-50%|400x300](${IMAGE} "图注")`);
+	assert.match(percentage, /alt="说明"/);
+	assert.match(percentage, /width: 50%;/);
+	assert.doesNotMatch(percentage, /400px|300px/);
+	assert.match(percentage, /data-image-size="explicit"/);
+	const pixels = await render(`![说明|400](${IMAGE})`);
+	assert.match(pixels, /width: 400px;/);
+	assert.match(pixels, /alt="说明"/);
+	const bounds = await render(`![说明|400x300](${IMAGE})`);
+	assert.match(bounds, /max-width: min\(100%, 400px\); max-height: 300px;/);
+	assert.match(bounds, /height: auto; object-fit: contain;/);
+	assert.deepEqual(parseMarkdownImageAlt("说明|0x300"), { alt: "说明|0x300", width: undefined });
 });
 
 test("plain standalone images keep their layout and only gain lazy loading", async () => {

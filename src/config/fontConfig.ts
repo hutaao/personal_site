@@ -89,7 +89,8 @@ export const fontConfig: FontConfig = withUserConfig("font", {
 			source: "local",
 			variants: [
 				{
-					file: "src/assets/fonts/Yozai-Medium.ttf",
+					// 完整字符集的 WOFF2 与原始 TTF 字形一致，减少开发预览传输量；生产构建继续子集化。
+					file: "src/assets/fonts/Yozai-Medium.woff2",
 					weight: 500,
 					style: "normal",
 				},

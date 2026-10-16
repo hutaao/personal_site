@@ -20,7 +20,7 @@ export interface SiteStats {
 	tags: number;
 	/** 系列实体数 */
 	series: number;
-	/** 全部文章 remark 字数之和 */
+	/** 当前可见文章与动态的完整正文字数之和（不计代码块） */
 	words: number;
 	/** 运行天数：以最早一篇文章的发布日为起点（无文章则 0） */
 	days: number;
@@ -44,13 +44,14 @@ export async function getSiteStats(): Promise<SiteStats> {
 		seriesConfig.enable ? getSeriesCatalog() : Promise.resolve(null),
 	]);
 
-	// 总字数、最早发布日与最近更新日来自同一批文章，一次遍历
-	let words = 0;
+	// Both collections already apply the same production draft filtering.
+	// Count full moments, never just the collapsed preview.
+	let words = moments.reduce((sum, moment) => sum + (moment.words ?? 0), 0);
 	let earliest = Number.POSITIVE_INFINITY;
 	let latestActivity = 0;
 	for (const post of posts) {
 		const { remarkPluginFrontmatter } = await render(post);
-		words += remarkPluginFrontmatter.words ?? 0;
+		words += remarkPluginFrontmatter.contentWords ?? remarkPluginFrontmatter.words ?? 0;
 		const published = new Date(post.data.published).getTime();
 		if (published < earliest) earliest = published;
 		const updated = post.data.updated

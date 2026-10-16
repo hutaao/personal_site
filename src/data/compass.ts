@@ -35,4 +35,23 @@ export interface CompassShelf {
 	entries: CompassEntry[];
 }
 
-export const compassData: CompassShelf[] = [];
+export const compassData: CompassShelf[] = [
+	{
+		key: "dev",
+		name: "开发",
+		blurb: "写代码时离不开的站点，持续整理中。",
+		entries: [],
+	},
+	{
+		key: "projects",
+		name: "项目",
+		blurb: "有趣且有用的开源项目，持续整理中。",
+		entries: [],
+	},
+	{
+		key: "resources",
+		name: "资源",
+		blurb: "文档、学习资料与教程，持续整理中。",
+		entries: [],
+	},
+];

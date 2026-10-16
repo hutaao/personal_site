@@ -1,0 +1,12 @@
+{
+  "title": "长白山",
+  "description": "天铸神山，圣地长白",
+  "date": "2026-10-08",
+  "location": "吉林省延边朝鲜族自治州",
+  "tags": ["自然风景"],
+  "layout": "masonry",
+  "columns": 3,
+  "hidden": false,
+  "cover":"02.jpg"
+  
+}

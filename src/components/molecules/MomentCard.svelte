@@ -13,6 +13,8 @@ import { i18n } from "@i18n/translation";
 import type { MomentItem } from "@utils/content-utils";
 import { formatDateToYYYYMMDDHHmm } from "@utils/date-utils";
 import { reveal } from "@utils/motion";
+import { tick } from "svelte";
+import { initFancybox } from "@utils/fancybox-handler";
 
 export type MomentAuthor = {
 	name: string;
@@ -38,9 +40,25 @@ let {
 
 const publishedAt = $derived(new Date(moment.published));
 const timeText = $derived(formatDateToYYYYMMDDHHmm(publishedAt));
+let expanded = $state(false);
+let card: HTMLElement;
+let toggleButton: HTMLButtonElement;
+const contentId = $derived(`moment-content-${moment.id}`);
+async function toggleExpanded() {
+	const collapsing = expanded;
+	expanded = !expanded;
+	await tick();
+	if (collapsing) {
+		const top = card.getBoundingClientRect().top;
+		if (top < 80) window.scrollBy({ top: top - 88, behavior: "instant" });
+		toggleButton?.focus({ preventScroll: true });
+	} else {
+		void initFancybox();
+	}
+}
 </script>
 
-<article class="moment-card {className}" id="moment-{moment.id}" use:reveal={{ delay }}>
+<article bind:this={card} class="moment-card {className}" id="moment-{moment.id}" use:reveal={{ delay }}>
 	<header class="moment-card__header">
 		<a class="moment-card__author" href={author.url}>
 			<!-- 作者名紧邻头像可读，头像按装饰图处理（避免与 aria-label 冗余） -->
@@ -75,10 +93,15 @@ const timeText = $derived(formatDateToYYYYMMDDHHmm(publishedAt));
 	</header>
 
 	{#if moment.html.trim()}
-		<div class="moment-card__content custom-md">
+		<div id={contentId} class="moment-card__content custom-md">
 			<!-- 正文为构建期渲染产物（站点 markdown 插件链），非用户输入 -->
-			{@html moment.html}
+			{@html !expanded && moment.previewHtml ? moment.previewHtml : moment.html}
 		</div>
+	{/if}
+	{#if moment.previewHtml}
+		<button bind:this={toggleButton} type="button" class="moment-card__expand" aria-expanded={expanded} aria-controls={contentId} onclick={toggleExpanded}>
+			{#if !expanded}<span aria-hidden="true">……</span>{/if}{expanded ? "收起" : "展开全文"}
+		</button>
 	{/if}
 
 	{#if moment.images.length > 0}
@@ -192,6 +215,21 @@ const timeText = $derived(formatDateToYYYYMMDDHHmm(publishedAt));
 		gap: var(--m3e-space-3)
 		flex-wrap: wrap
 		margin-top: var(--m3e-space-3)
+
+	&__expand
+		align-self: flex-start
+		margin-top: 0.5rem
+		padding: 0.25rem 0
+		border: 0
+		background: transparent
+		color: var(--primary)
+		font: inherit
+		cursor: pointer
+		&:hover
+			text-decoration: underline
+		&:focus-visible
+			outline: 2px solid var(--primary)
+			outline-offset: 4px
 
 	&__location
 		display: inline-flex

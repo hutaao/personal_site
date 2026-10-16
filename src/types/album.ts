@@ -21,6 +21,7 @@ export type AlbumGroup = {
 	id: string;
 	title: string;
 	description: string;
+	/** Resolved public URL: local info.json may select a photo filename without duplicating the file. */
 	cover: string;
 	date: string;
 	location: string;

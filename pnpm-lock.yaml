@@ -92,6 +92,9 @@ importers:
       hast-util-from-html:
         specifier: 2.0.3
         version: 2.0.3
+      hast-util-to-html:
+        specifier: 9.0.5
+        version: 9.0.5
       hastscript:
         specifier: ^9.0.1
         version: 9.0.1
@@ -14508,3 +14511,4 @@ snapshots:
       marked: 18.1.1
 
   recaptcha-v3@1.11.3: {}
+

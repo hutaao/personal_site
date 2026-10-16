@@ -1,4 +1,5 @@
 /** markdown-processor.mjs 的类型面（实现文件为 .mjs，astro.config 与 content-utils 共用） */
+import type { RehypePlugins, RemarkPlugins } from "@astrojs/markdown-remark";
 
 export interface SiteMarkdownRenderResult {
 	code: string;
@@ -18,8 +19,8 @@ export interface SiteMarkdownRenderer {
 export declare const siteMarkdownProcessor: {
 	name: "unified";
 	options: {
-		remarkPlugins: unknown[];
-		rehypePlugins: unknown[];
+		remarkPlugins: RemarkPlugins;
+		rehypePlugins: RehypePlugins;
 	};
 	createRenderer(
 		shared?: Record<string, unknown>,

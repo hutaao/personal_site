@@ -2,6 +2,19 @@
   img
     border-radius: var(--shape-corner-m)
 
+  /* 普通正文图限制默认视觉尺寸；画廊、Mermaid 与作者显式尺寸自行管理。 */
+  img:not([data-image-size]):not([style]):not([data-no-enhance]):not(:where(.image-grid *, .markdown-mermaid *, figure:not(.markdown-image-figure) *))
+    width: auto
+    height: auto
+    max-width: unquote("min(100%, 45rem)")
+    max-height: 75vh
+    object-fit: contain
+    margin-inline: auto
+
+  img[data-image-size]
+    max-width: 100%
+    height: auto
+
   hr
     border: 0
     border-top: 1px solid var(--line-divider)

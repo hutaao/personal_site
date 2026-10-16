@@ -1,4 +1,10 @@
+import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { type CollectionEntry, getCollection } from "astro:content";
+import { unified } from "@astrojs/markdown-remark";
+import { rehypeMomentImages } from "../plugins/rehype-moment-images.mjs";
+import { resolveAsset } from "./asset-utils";
+import { createMomentPreview } from "./moment-preview.mjs";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import {
@@ -200,6 +206,10 @@ export type MomentItem = {
 	published: string;
 	/** 正文 HTML（站点统一 markdown 插件链渲染） */
 	html: string;
+	/** Null/absent for short moments; computed on the server, not by shipping an HTML parser. */
+	previewHtml?: string | null;
+	/** Full prose count, independent of the collapsed excerpt. */
+	words?: number;
 	pinned: boolean;
 	location: string;
 	/** 心情 Iconify 图标名 */
@@ -251,18 +261,34 @@ export async function getSortedMoments(): Promise<MomentItem[]> {
 
 	const sorted = entries.sort(comparePublicationEntries);
 
-	momentsRendererPromise ??= siteMarkdownProcessor.createRenderer({});
+	momentsRendererPromise ??= unified({
+		...siteMarkdownProcessor.options,
+		rehypePlugins: [
+			...siteMarkdownProcessor.options.rehypePlugins,
+			[rehypeMomentImages, {
+				resolve: async (src: string, filePath: string) => {
+					if (/^(?:[a-z][a-z\d+.-]*:|\/\/|#)/i.test(src)) return src;
+					if (src.startsWith("/")) return url(src);
+					const basePath = path.relative(path.resolve("src"), path.dirname(filePath));
+					return resolveAsset(decodeURI(src), basePath);
+				},
+			}],
+		],
+	}).createRenderer({});
 	const renderer = await momentsRendererPromise;
 
 	return Promise.all(
 		sorted.map(async (entry) => {
-			const { code } = await renderer.render(entry.body ?? "", {
+			const { code, metadata } = await renderer.render(entry.body ?? "", {
+				fileURL: entry.filePath ? pathToFileURL(path.resolve(entry.filePath)) : undefined,
 				frontmatter: entry.data as unknown as Record<string, unknown>,
 			});
 			return {
 				id: entry.id,
 				published: new Date(entry.data.published).toISOString(),
 				html: code,
+				previewHtml: createMomentPreview(code),
+				words: Number((metadata.frontmatter as Record<string, unknown>)?.contentWords ?? 0),
 				pinned: entry.data.pinned,
 				location: entry.data.location,
 				mood: entry.data.mood,

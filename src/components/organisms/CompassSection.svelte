@@ -58,7 +58,7 @@ function hostOf(href: string): string {
 	}
 }
 
-/** 过滤：分组命中 + 搜索命中（label/note/域名）；整组无命中则组不渲染 */
+/** 未搜索时保留待收录的空分组；搜索时只显示有匹配站点的分组。 */
 const filteredShelves = $derived.by(() => {
 	const normalizedQuery = query.trim().toLowerCase();
 	return shelves
@@ -74,7 +74,7 @@ const filteredShelves = $derived.by(() => {
 					)
 				: shelf.entries,
 		}))
-		.filter((shelf) => shelf.entries.length > 0);
+		.filter((shelf) => !normalizedQuery || shelf.entries.length > 0);
 });
 
 const totalCount = $derived(
@@ -180,11 +180,13 @@ onMount(() => {
 			{#each filteredShelves as shelf (shelf.key)}
 				<section class="compass-shelf" data-shelf={shelf.key}>
 					<SectionTitle title={shelf.name} subtitle={shelf.blurb} icon={shelf.icon} />
-					<div class="compass-shelf__grid">
-						{#each shelf.entries as entry, i (entry.href)}
-							<CompassTile {entry} delay={Math.min(i, 7) * 45} />
-						{/each}
-					</div>
+					{#if shelf.entries.length > 0}
+						<div class="compass-shelf__grid">
+							{#each shelf.entries as entry, i (entry.href)}
+								<CompassTile {entry} delay={Math.min(i, 7) * 45} />
+							{/each}
+						</div>
+					{/if}
 				</section>
 			{/each}
 		{/key}

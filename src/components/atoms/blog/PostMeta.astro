@@ -6,6 +6,7 @@
  * body-medium 文字；链接 hover 变 primary。
  */
 import MetaIcon from "@components/atoms/display/MetaIcon.astro";
+import Tooltip from "@components/atoms/overlay/Tooltip.svelte";
 
 export interface BlogMetaLink {
 	name: string;
@@ -48,31 +49,37 @@ const {
 
 <div class:list={["m3-blog-postmeta", className]}>
 	{published && (
-		<span class="m3-blog-postmeta__item">
-			<MetaIcon icon="material-symbols:calendar-today-outline-rounded" />
-			<span class="m3-blog-postmeta__text">{published}</span>
-		</span>
+		<Tooltip label="发布日期" client:load>
+			<span class="m3-blog-postmeta__item" data-postmeta="published">
+				<MetaIcon icon="material-symbols:calendar-today-outline-rounded" />
+				<time class="m3-blog-postmeta__text" datetime={published} aria-label={`发布日期：${published}`}>{published}</time>
+			</span>
+		</Tooltip>
 	)}
 
 	{!hideUpdate && updated && updated !== published && (
-		<span class="m3-blog-postmeta__item">
-			<MetaIcon icon="material-symbols:edit-calendar-outline-rounded" />
-			<span class="m3-blog-postmeta__text">{updated}</span>
-		</span>
+		<Tooltip label="最后更新日期" client:load>
+			<span class="m3-blog-postmeta__item" data-postmeta="updated">
+				<MetaIcon icon="material-symbols:edit-calendar-outline-rounded" />
+				<time class="m3-blog-postmeta__text" datetime={updated} aria-label={`最后更新日期：${updated}`}>{updated}</time>
+			</span>
+		</Tooltip>
 	)}
 
-	<span class="m3-blog-postmeta__item">
-		<MetaIcon icon="material-symbols:book-2-outline-rounded" />
-		{category ? (
-			<a
-				class="m3-blog-postmeta__link"
-				href={category.href}
-				aria-label={`View all posts in the ${category.name} category`}
-			>{category.name}</a>
-		) : (
-			<span class="m3-blog-postmeta__text">{uncategorizedLabel}</span>
-		)}
-	</span>
+	<Tooltip label="分类" client:load>
+		<span class="m3-blog-postmeta__item" data-postmeta="category">
+			<MetaIcon icon="material-symbols:book-2-outline-rounded" />
+			{category ? (
+				<a
+					class="m3-blog-postmeta__link"
+					href={category.href}
+					aria-label={`分类：${category.name}，查看该分类的文章`}
+				>{category.name}</a>
+			) : (
+				<span class="m3-blog-postmeta__text">{uncategorizedLabel}</span>
+			)}
+		</span>
+	</Tooltip>
 
 	{wordCount && (
 		<span class="m3-blog-postmeta__item">
@@ -82,25 +89,27 @@ const {
 	)}
 
 	{!hideTags && (
-		<span class="m3-blog-postmeta__item">
-			<MetaIcon icon="material-symbols:tag-rounded" />
-			{tags.length > 0 ? (
-				<span class="m3-blog-postmeta__tags">
-					{tags.map((t, i) => (
-						<Fragment>
-							{i > 0 && <span class="m3-blog-postmeta__sep" aria-hidden="true">/</span>}
-							<a
-								class="m3-blog-postmeta__link"
-								href={t.href}
-								aria-label={`View all posts with the ${t.name} tag`}
-							>{t.name}</a>
-						</Fragment>
-					))}
-				</span>
-			) : (
-				<span class="m3-blog-postmeta__text">{noTagsLabel}</span>
-			)}
-		</span>
+		<Tooltip label="标签" client:load>
+			<span class="m3-blog-postmeta__item" data-postmeta="tags">
+				<MetaIcon icon="material-symbols:tag-rounded" />
+				{tags.length > 0 ? (
+					<span class="m3-blog-postmeta__tags">
+						{tags.map((t, i) => (
+							<Fragment>
+								{i > 0 && <span class="m3-blog-postmeta__sep" aria-hidden="true">/</span>}
+								<a
+									class="m3-blog-postmeta__link"
+									href={t.href}
+									aria-label={`标签：${t.name}，查看带此标签的文章`}
+								>{t.name}</a>
+							</Fragment>
+						))}
+					</span>
+				) : (
+					<span class="m3-blog-postmeta__text">{noTagsLabel}</span>
+				)}
+			</span>
+		</Tooltip>
 	)}
 </div>
 

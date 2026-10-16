@@ -1,4 +1,7 @@
 import { expect, test } from "@playwright/test";
+import { mkdir, rm, writeFile } from "node:fs/promises";
+import path from "node:path";
+import sharp from "sharp";
 
 test.describe("相册页响应式滚动", () => {
 	test("从手机视口切换到桌面视口后仍可滚动", async ({ page }) => {
@@ -26,6 +29,58 @@ test.describe("相册页响应式滚动", () => {
 		await expect(page.locator("body")).not.toHaveAttribute(
 			"data-overlayscrollbars",
 		);
+	});
+});
+
+test.describe("shared local cover", () => {
+	const albumRoot = path.resolve(process.env.BLOG_TEST_ROOT ?? process.cwd(), "public/images/albums");
+	const owned: string[] = [];
+	const ids = ["local-shared-cover-check", "local-shared-cover-protected-check"];
+	test.use({ reducedMotion: "reduce" });
+	test.beforeAll(async () => {
+		await mkdir(albumRoot, { recursive: true });
+		for (const [index, id] of ids.entries()) {
+			const dir = path.join(albumRoot, id);
+			await mkdir(dir); // Never overwrite an existing album.
+			owned.push(dir);
+			await writeFile(path.join(dir, "info.json"), JSON.stringify({ title: id, cover: "01.jpg", date: "2026-10-15", layout: index ? "masonry" : "grid", columns: index ? 4 : 2, ...(index ? { password: "fixture-password" } : {}) }));
+			for (const [name, width, height] of [["01.jpg", 120, 180], ["02.jpg", 180, 120]] as const) {
+				await sharp({ create: { width, height, channels: 3, background: "#163041" } }).jpeg().toFile(path.join(dir, name));
+			}
+		}
+	});
+	test.afterAll(async () => {
+		for (const dir of owned) {
+			if (!path.resolve(dir).startsWith(albumRoot + path.sep) || !path.basename(dir).startsWith("local-shared-cover-")) throw new Error("Refusing cleanup outside owned fixture root");
+			await rm(dir, { recursive: true, force: true });
+		}
+	});
+	test.beforeEach(async ({ page }) => { await page.route("https://**/*", route => route.abort()); });
+
+	test("one photo supplies the index cover and remains in the ordinary gallery", async ({ page }) => {
+		await page.goto("/albums/");
+		const link = page.locator(`.album-card__link[href="/albums/${ids[0]}/"]`);
+		await expect(link.locator("img")).toHaveAttribute("src", new RegExp(`${ids[0]}/01\\.jpg$`));
+		await page.waitForFunction(() => Boolean(window.swup));
+		await link.click();
+		await expect(page).toHaveURL(new RegExp(`/albums/${ids[0]}/$`));
+		await expect(page.locator(".album-gallery__item")).toHaveCount(2);
+		await expect(page.locator(".album-detail__hero > img")).toHaveAttribute("src", new RegExp(`${ids[0]}/01\\.jpg$`));
+		await expect(page.locator('.album-gallery__item img[src$="/01.jpg"]')).toHaveCount(1);
+		await expect(page.locator(".album-gallery")).toHaveClass(/album-gallery--grid/);
+	});
+
+	test("the shared cover also survives protected-album unlock and preserves layout", async ({ page }) => {
+		await page.goto(`/albums/${ids[1]}/`);
+		await expect(page.locator(".album-detail__hero > img")).toHaveAttribute("src", new RegExp(`${ids[1]}/01\\.jpg$`));
+		await expect(page.locator(".password-gate")).toBeVisible();
+		await expect(page.locator(".album-gallery__item")).toHaveCount(0);
+		await page.locator('.password-gate input[name="password"]').fill("fixture-password");
+		await page.locator('.password-gate button[type="submit"]').click();
+		await expect(page.locator(".album-gallery__item")).toHaveCount(2);
+		await expect(page.locator('.album-gallery__item img[src$="/01.jpg"]')).toHaveCount(1);
+		await expect(page.locator(".album-gallery")).toHaveClass(/album-gallery--masonry/);
+		await expect(page.locator(".password-gate")).toBeHidden();
 	});
 });
 

@@ -130,8 +130,21 @@ const titleLabel =
 	</div>
 	{hasCover ? (
 		<a class="m3-blog-postcard__cover" href={href} aria-label={title}>
+			<picture class="m3-blog-postcard__cover-backdrop" aria-hidden="true">
+				{imageAvifSrcset && <source type="image/avif" srcset={imageAvifSrcset} sizes={imageSizes} />}
+				<img
+					src={image}
+					srcset={imageSrcset}
+					sizes={imageSizes}
+					width={imageWidth}
+					height={imageHeight}
+					alt=""
+					loading="lazy"
+					decoding="async"
+				/>
+			</picture>
 			<span class="m3-blog-postcard__cover-loading" aria-hidden="true"></span>
-			<picture>
+			<picture class="m3-blog-postcard__cover-foreground">
 				{imageAvifSrcset && <source type="image/avif" srcset={imageAvifSrcset} sizes={imageSizes} />}
 				<img
 					src={image}
@@ -278,6 +291,8 @@ const titleLabel =
 		display: block
 		overflow: hidden
 		text-decoration: none
+		background: var(--surface-container-low)
+		isolation: isolate
 		> :global(.m3-blog-postcard__cover-loading)
 			position: absolute
 			inset: 0
@@ -285,6 +300,7 @@ const titleLabel =
 			align-items: center
 			justify-content: center
 			background: var(--surface-container-low)
+			z-index: 2
 			transition: opacity var(--m3e-duration-short) var(--m3e-easing-standard)
 		> :global(.m3-blog-postcard__cover-loading)::after
 			content: ""
@@ -301,8 +317,27 @@ const titleLabel =
 			width: 100%
 			height: 100%
 		> picture > img
-			object-fit: cover
 			position: relative
+		/* 同一 srcset/sizes 复用已选派生资源；仅对静态底层模糊，不做动画或常驻 will-change。 */
+		> .m3-blog-postcard__cover-backdrop
+			position: absolute
+			inset: -12px
+			width: calc(100% + 24px)
+			height: calc(100% + 24px)
+			pointer-events: none
+			opacity: 0.92
+			filter: blur(12px)
+			> img
+				object-fit: cover
+			&::after
+				content: ""
+				position: absolute
+				inset: 0
+				background: unquote("color-mix(in srgb, var(--surface-container-low) 5%, transparent)")
+		> .m3-blog-postcard__cover-foreground
+			position: relative
+			> img
+				object-fit: contain
 
 		@media (min-width: bp-md)
 			position: absolute
@@ -317,6 +352,7 @@ const titleLabel =
 	/* 封面触摸箭头：卡片 hover 时深色遮罩 + 白色大箭头（与原版封面一致） */
 	&__cover-mask
 		position: absolute
+		z-index: 3
 		inset: 0
 		/* 触摸箭头（原版）：默认隐藏，hover/触摸时深色遮罩 + 白色大箭头 */
 		background: transparent
@@ -329,6 +365,7 @@ const titleLabel =
 
 	&__cover-arrow
 		position: absolute
+		z-index: 3
 		inset: 0
 		display: flex
 		align-items: center

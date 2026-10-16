@@ -10,7 +10,8 @@ export interface ResponsiveSidebarConfig {
 
 /**
  * 解析侧栏配置：按 column 标签统计两栏各自的 enable widget。
- * 响应式断点沿用站点现有约定：
+ * 下述宽度断点用于触屏布局；鼠标桌面由 MainGridLayout 的 pointer/hover
+ * 媒体查询保留完整侧栏，空间不足时文档横向滚动。触屏断点：
  * - 1024px 以下：单列（grid-cols-1），侧栏与内容上下堆叠；
  * - 1024px 以上：两列（侧栏 --sidebar-width + 内容）；
  * - dual 编排且副栏有 widget 时，1280px（xl）起升为三列。
@@ -49,12 +50,12 @@ export function generateGridClasses(config: ResponsiveSidebarConfig): string {
 	}
 	if (isDualColumn(config)) {
 		return config.side === "left"
-			? "grid-cols-1 lg:grid-cols-[var(--sidebar-width)_1fr] xl:grid-cols-[var(--sidebar-width)_1fr_var(--sidebar-width)]"
-			: "grid-cols-1 lg:grid-cols-[1fr_var(--sidebar-width)] xl:grid-cols-[var(--sidebar-width)_1fr_var(--sidebar-width)]";
+			? "grid-cols-1 lg:grid-cols-[var(--sidebar-width)_minmax(0,1fr)] xl:grid-cols-[var(--sidebar-width)_minmax(0,1fr)_var(--sidebar-width)]"
+			: "grid-cols-1 lg:grid-cols-[minmax(0,1fr)_var(--sidebar-width)] xl:grid-cols-[var(--sidebar-width)_minmax(0,1fr)_var(--sidebar-width)]";
 	}
 	return config.side === "left"
-		? "grid-cols-1 lg:grid-cols-[var(--sidebar-width)_1fr]"
-		: "grid-cols-1 lg:grid-cols-[1fr_var(--sidebar-width)]";
+		? "grid-cols-1 lg:grid-cols-[var(--sidebar-width)_minmax(0,1fr)]"
+		: "grid-cols-1 lg:grid-cols-[minmax(0,1fr)_var(--sidebar-width)]";
 }
 
 /**
@@ -66,9 +67,10 @@ export function generatePrimarySidebarClasses(
 ): string {
 	const base = [
 		"mb-4",
+		"min-w-0",
 		"row-start-2",
 		"row-end-3",
-		"col-span-2",
+		"col-span-1",
 		"lg:row-start-1",
 		"lg:row-end-2",
 		"lg:col-span-1",
@@ -94,6 +96,7 @@ export function generateSecondarySidebarClasses(
 ): string {
 	const base = [
 		"hidden",
+		"min-w-0",
 		"xl:block",
 		"xl:row-start-1",
 		"xl:row-end-2",
@@ -114,7 +117,7 @@ export function generateMainContentClasses(
 ): string {
 	const base = [
 		"transition-swup-fade",
-		"col-span-2",
+		"col-span-1",
 		"lg:col-span-1",
 		"overflow-hidden",
 		"min-w-0",

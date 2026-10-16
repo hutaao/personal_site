@@ -81,7 +81,9 @@ const mainContentClasses = generateMainContentClasses(sidebarResponsive);
 <BannerStage page={page} title={title} description={description} date={bannerDate} />
 
 <!-- Main content -->
-<div id="main-layout" class="absolute w-full z-30 pointer-events-none">
+<div id="main-layout" class="absolute w-full z-30 pointer-events-none"
+    data-desktop-sidebar-layout={isDualColumn(sidebarResponsive) ? "dual" : sidebarResponsive.hasPrimary ? "single" : "none"}
+    data-desktop-sidebar-side={sidebarResponsive.side}>
     <!-- The pointer-events-none here prevent blocking the click event of the TOC -->
     <div class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto">
 		<div id="main-grid" class:list={["transition duration-[var(--m3e-duration-long)] w-full left-0 right-0 grid grid-rows-[auto_1fr_auto] lg:grid-rows-[auto] mx-auto gap-4 px-2 md:px-4", gridClasses]}>
@@ -108,14 +110,14 @@ const mainContentClasses = generateMainContentClasses(sidebarResponsive);
                         <!-- the overflow-hidden here prevent long text break the layout-->
                         <!-- make id different from windows.swup global property -->
                         <slot></slot>
-                        <div class="footer col-span-2 onload-animation hidden lg:block">
+                        <div class="footer col-span-full onload-animation hidden lg:block">
                             <Footer></Footer>
                         </div>
                     </div>
                 </main>
             </div>
 
-            <div class="footer col-span-2 onload-animation block lg:hidden">
+            <div class="footer col-span-full onload-animation block lg:hidden">
                 <Footer></Footer>
             </div>
         </div>
@@ -135,3 +137,46 @@ const mainContentClasses = generateMainContentClasses(sidebarResponsive);
 )}
 
 </Layout>
+
+
+<style is:global>
+/* Mouse/trackpad desktop keeps its reading columns when browser zoom reduces
+   the CSS viewport. The document itself scrolls horizontally; fixed navigation
+   remains viewport sized and can use its drawer at narrow widths. */
+@media (hover: hover) and (pointer: fine) {
+  html { font-size: 16px; }
+  #main-layout[data-desktop-sidebar-layout="dual"] { min-inline-size: 1280px; }
+  #main-layout[data-desktop-sidebar-layout="single"] { min-inline-size: 1100px; }
+  #main-layout #main-grid { grid-template-rows: auto; }
+  #main-layout[data-desktop-sidebar-layout="single"] #main-grid {
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+    grid-template-areas: "primary content";
+  }
+  #main-layout[data-desktop-sidebar-layout="single"][data-desktop-sidebar-side="right"] #main-grid {
+    grid-template-columns: minmax(0, 1fr) var(--sidebar-width);
+    grid-template-areas: "content primary";
+  }
+  #main-layout[data-desktop-sidebar-layout="dual"] #main-grid {
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr) var(--sidebar-width);
+    grid-template-areas: "primary content secondary";
+  }
+  #main-layout[data-desktop-sidebar-layout="dual"][data-desktop-sidebar-side="right"] #main-grid {
+    grid-template-areas: "secondary content primary";
+  }
+  #main-layout:not([data-desktop-sidebar-layout="none"]) #sidebar {
+    grid-area: primary;
+    max-inline-size: var(--sidebar-width);
+    height: 100%;
+  }
+  #main-layout[data-desktop-sidebar-layout="dual"] #sidebar-secondary {
+    display: block;
+    grid-area: secondary;
+    max-inline-size: var(--sidebar-width);
+    height: 100%;
+  }
+  #main-layout:not([data-desktop-sidebar-layout="none"]) #main-content-column { grid-area: content; }
+  #main-layout #sidebar-sticky, #main-layout #sidebar-secondary-sticky { position: sticky; top: 5rem; }
+  #main-layout #content-wrapper > .footer { display: block; }
+  #main-layout #main-grid > .footer { display: none; }
+}
+</style>

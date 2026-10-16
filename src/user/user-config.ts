@@ -5,8 +5,8 @@
  * - config/site.yaml
  * - config/profile.yaml
  * - config/license.yaml
- * - config/comment.yaml
  * - config/announcement.yaml
+ * - config/comment.yaml
  * - config/footer.yaml
  * - config/music.yaml
  * - config/umami.yaml
@@ -47,7 +47,7 @@ type DeepPartial<T> = T extends readonly unknown[]
 // config/site.yaml
 const site: DeepPartial<SiteConfig> = {
 	title: "hutaao",
-	subtitle: "把好奇心，写成看得见的路径。",
+	subtitle: "四百年，不过是明日复明日罢了",
 	banner: {
 		src: {
 			desktop: [
@@ -93,7 +93,7 @@ const site: DeepPartial<SiteConfig> = {
 // config/profile.yaml
 const profile: DeepPartial<ProfileConfig> = {
 	name: "hutaao",
-	bio: "记录技术、科研与生活的学习手记。",
+	bio: "永远追寻自由",
 	avatar: "assets/images/hutaao/avatar.png",
 	links: [
 		{
@@ -118,14 +118,44 @@ const license: DeepPartial<LicenseConfig> = {
 
 // config/announcement.yaml
 const announcement: DeepPartial<AnnouncementConfig> = {
-	title: "",
-	content: "",
-	closable: true,
+	title: "公告",
+	content: "欢迎来到我的博客！\n这里记录着我的生活\n",
+	closable: false,
 	link: {
 		enable: false,
 		text: "",
 		url: "",
 		external: true,
+	},
+};
+
+// config/comment.yaml
+const comment: DeepPartial<CommentConfig> = {
+	enable: true,
+	provider: "waline",
+	guestbookOnly: true,
+	localOnly: false,
+	lazy: true,
+	waline: {
+		serverURL: "https://hutaao-waline.vercel.app",
+		lang: "zh-CN",
+		placeholder: "欢迎留言，昵称可选，无需填写邮箱。",
+		emoji: [
+			"https://unpkg.com/@waline/emojis@1.1.0/weibo",
+		],
+		imageUploader: true,
+		imageStorage: "blob",
+		localServer: {
+			commentInterval: 3,
+			showBrowser: true,
+			showRegion: false,
+		},
+	},
+	twikoo: {
+		envId: "",
+		scriptUrl: "https://cdn.jsdelivr.net/npm/twikoo@2.0.15/dist/twikoo.min.js",
+		lang: "zh-CN",
+		placeholder: "欢迎留言，分享你的想法和建议。",
 	},
 };
 
@@ -160,6 +190,8 @@ const about: DeepPartial<AboutConfig> = {
 // config/friends.yaml
 const friends: DeepPartial<FriendsConfig> = {
 	enable: true,
+	title: "$t:friends",
+	description: "欢迎交换友链",
 };
 
 // config/moments.yaml
@@ -180,24 +212,7 @@ const albums: DeepPartial<AlbumsConfig> = {
 const compass: DeepPartial<CompassConfig> = {
 	enable: true,
 	title: "$t:compass",
-	description: "$t:compassBanner",
-};
-
-// config/comment.yaml
-const comment: DeepPartial<CommentConfig> = {
-	enable: true,
-	provider: "waline",
-	guestbookOnly: true,
-	localOnly: false,
-	lazy: true,
-	waline: {
-		serverURL: "https://hutaao-waline.vercel.app",
-		lang: "zh-CN",
-		placeholder: "欢迎留言，昵称可选，无需填写邮箱。",
-		emoji: ["https://unpkg.com/@waline/emojis@1.1.0/weibo"],
-		imageUploader: true,
-		imageStorage: "blob",
-	},
+	description: "收藏的一些网站以及项目推荐，按分类整理",
 };
 
 /** 领域名 -> 该领域的用户覆盖值（仅包含用户显式声明的键）。 */
