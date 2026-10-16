@@ -1,29 +1,35 @@
-# 关于 hutaao
+# 关于本站
 
-记录技术、科研与生活的学习手记。
+欢迎来到 **hutaao** 的个人网站！本站暂时处于测试状态，不过站主是个懒人，不清楚什么时候发布下一批更新。
 
-把好奇心，写成看得见的路径。
-
-[GitHub](https://github.com/hutaao)
-
+ 
 ## 网页技术实现
 
-本站基于开源博客主题 [Shirone](https://github.com/LyraVoid/Shirone) 搭建，以静态页面呈现文章，配合交互组件实现主题切换、音乐播放与站内导航。部分定制与调试借助 AI 辅助完成，并在日常使用中持续检查、调整。
+本站基于开源主题 [Shirone](https://github.com/LyraVoid/Shirone) 搭建，在原有设计上逐步调整，部分定制与调试借助 AI 辅助完成。
 
-| 部分 | 使用的技术与用途 |
-| --- | --- |
-| 页面与交互 | [Astro](https://astro.build/) 负责构建页面，[Svelte](https://svelte.dev/) 提供交互组件，配合 [TypeScript](https://www.typescriptlang.org/) 开发。 |
-| 界面与配色 | 使用 [Tailwind CSS](https://tailwindcss.com/) 和 [Stylus](https://stylus-lang.com/)，沿用 Material 3 Expressive 的设计风格，支持明暗主题和配色调整。 |
-| 内容写作 | 文章以 Markdown 为主，日常通过 [Obsidian](https://obsidian.md/) 整理和编辑；网站也支持 MDX，以及公式、流程图和代码高亮等内容。 |
-| 站内搜索 | [Pagefind](https://pagefind.app/) 在构建时生成全文搜索索引，访客可以在网页中检索已发布内容。 |
-| 构建与发布 | 代码和公开内容通过 Git 管理，由 [GitHub Actions](https://github.com/features/actions) 自动构建，发布到 [GitHub Pages](https://pages.github.com/)。 |
-| 访问统计 | 使用 [Umami](https://umami.is/) 了解网站访问情况，统计数字不在网页中公开显示。 |
+- **页面与交互**：使用 Astro、Svelte 和 TypeScript，兼顾静态页面的阅读体验与必要的交互。
+- **界面与配色**：沿用 Material 3 Expressive 风格，支持明暗主题、动态配色和壁纸切换；字体以 Outfit 和悠哉圆体（Yozai）为主。
+- **写作与阅读**：通过 Obsidian 编写 Markdown，支持公式、流程图与代码高亮，使用 Pagefind 提供站内搜索。
+- **发布与留言**：由 GitHub Actions 自动构建并发布到 GitHub Pages，留言功能使用 Waline。
 
-字体主要使用 Outfit、悠哉圆体（Yozai）和 JetBrains Mono。中文字体在正式构建时按内容生成 WOFF2 子集，减少字体下载量。本地文章封面会生成 AVIF／WebP 等派生图片，并提供不同尺寸供浏览器选择；清晰原图与模糊背景配合展示，兼容横图、竖图和方图。
-
-## 网站参考说明
+## 参考与致谢
 
 - **[Shirone](https://github.com/LyraVoid/Shirone)**：本站的主题基础，整体组件与配色设计来自该项目；本页的技术介绍参考了其[演示站关于页](https://shirone.mysqil.com/about/)。
-- **[Firefly](https://github.com/CuteLeaf/Firefly)／[夏夜流萤](https://blog.cuteleaf.cn/about/)**：首页入场效果与部分视觉效果的参考和移植来源；关于页将个人介绍、站点说明与联系方式结合的组织方式也提供了启发。
+- **[Firefly](https://github.com/CuteLeaf/Firefly)**：首页入场效果与部分视觉效果的参考和移植来源，也为关于页的内容组织提供了启发。
+- **[番茄主理人 · fqzlr](https://blog.fqzlr.top/)**：外观、壁纸与特效设置的重要参考，站点中的搭建记录也为本站的调整提供了思路。
 
-感谢这些开源项目的作者与贡献者。本站在此基础上，根据自己的写作与阅读需求继续调整布局、交互和内容展示；相关开源代码保留原有的作者与许可说明。
+感谢这些开源项目的作者与分享经验的站主。相关代码保留原有的作者与许可说明，本站也会在使用中继续学习和完善。
+
+## 联系方式
+
+**Email**：[点击发送邮件](mailto:hutaao1064@gmail.com)
+<br>
+**Github**： [也欢迎随便看看我的github主页](https://github.com/hutaao)
+
+*（或者其实，站主头像下面就有这两个按钮）*
+
+## 最后
+
+希望本站对你有所帮助！也希望与各位站主和路过的朋友交流，在各自的小站里一起进步。
+
+欢迎来[留言](../guestbook/)，分享想法、指出问题，也欢迎交换[友链](../friends/)。感谢你的到访，下次再见。
