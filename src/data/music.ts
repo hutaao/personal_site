@@ -14,6 +14,14 @@ import type { TrackDescriptor } from "@/types/musicConfig";
  */
 export const musicTracks: readonly TrackDescriptor[] = [
 	{
+		id: "shunv-de-pinge",
+		title: "淑女的品格",
+		artist: "洛天依 / 阿肆",
+		cover: "/music/shunv-de-pinge.jpg",
+		lyrics: "/music/shunv-de-pinge.lrc",
+		source: "/music/淑女的品格.mp3",
+	},
+	{
 		id: "xiachong",
 		title: "夏虫",
 		artist: "洛天依",
