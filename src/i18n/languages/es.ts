@@ -40,6 +40,7 @@ export const es: Translation = {
 	[Key.archiveGroupYear]: "Por año",
 	[Key.archiveGroupCategory]: "Por categoría",
 	[Key.archiveGroupTag]: "Por etiqueta",
+	[Key.searchUnavailable]: "La búsqueda no está disponible temporalmente. Vuelve a intentarlo.",
 	[Key.search]: "Buscar",
 	[Key.clear]: "Borrar",
 

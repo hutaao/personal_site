@@ -136,7 +136,11 @@ const wallpapers = await Promise.all(wallpaperSources.map(async (source) => {
 			(document.getElementById("scheme-switch") as HTMLButtonElement | null)?.click();
 		});
 		entrance.querySelector<HTMLButtonElement>('[data-firefly-action="search"]')?.addEventListener("click", () => {
-			(document.getElementById("search-input-desktop") as HTMLElement | null)?.click();
+			const trigger = document.getElementById("search-input-desktop-toggle");
+			const input = document.querySelector<HTMLInputElement>("#search-input-desktop:not(:disabled)");
+			if (trigger?.getClientRects().length) trigger.click();
+			else if (input?.getClientRects().length) input.focus();
+			else document.getElementById("search-switch")?.click();
 		});
 		entrance.querySelector<HTMLButtonElement>('[data-firefly-action="music"]')?.addEventListener("click", () => {
 			(document.querySelector('[aria-label="播放"], [aria-label="暂停"]') as HTMLButtonElement | null)?.click();

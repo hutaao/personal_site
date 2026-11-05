@@ -6,6 +6,7 @@
  * 展开折叠交互细节全部内聚在此，Search 有机体只负责搜索与结果面板。
  */
 import Icon from "@iconify/svelte";
+import { onDestroy, tick } from "svelte";
 
 let {
 	value = $bindable(""),
@@ -14,6 +15,7 @@ let {
 	name = "search",
 	placeholder = "",
 	onfocus = () => {},
+	onquerychange = () => {},
 	oncollapse = () => {},
 }: {
 	value?: string;
@@ -22,18 +24,20 @@ let {
 	name?: string;
 	placeholder?: string;
 	onfocus?: () => void;
+	onquerychange?: (query: string) => void;
 	oncollapse?: () => void;
 } = $props();
 
 let blurTimer: ReturnType<typeof setTimeout>;
+let input: HTMLInputElement;
 
-const expand = (): void => {
+const expand = async (): Promise<void> => {
 	expanded = true;
-	setTimeout(() => {
-		const input = document.getElementById(id) as HTMLInputElement;
-		input?.focus();
-	}, 0);
+	await tick();
+	input?.focus();
 };
+
+onDestroy(() => clearTimeout(blurTimer));
 
 // 失焦后延迟折叠，允许搜索结果点击先执行
 const handleBlur = (): void => {
@@ -51,26 +55,34 @@ const handleFocus = (): void => {
 
 <div class="hidden lg:block relative w-10 h-10 shrink-0">
     <div
-        class="m3-state-layer absolute right-0 top-0 flex items-center overflow-hidden rounded-full h-10 top-app-bar__search-shell
+        class="absolute right-0 top-0 flex items-center overflow-hidden rounded-full h-10 top-app-bar__search-shell
                {expanded ? 'top-app-bar__search-shell--expanded w-48 bg-(--surface-container-high)' : 'w-10 bg-transparent'}"
         style="transition: width var(--m3e-duration-medium) var(--m3e-easing-emphasized-decelerate), background-color var(--m3e-duration-short) var(--m3e-easing-standard);"
-        onclick={() => {
-            if (!expanded) expand();
-        }}
     >
-        <Icon
-            icon="material-symbols:search"
-            class="pointer-events-none shrink-0 text-[1.25rem] transition-colors duration-[var(--m3e-duration-short)]
-                   {expanded
-                       ? 'ml-3 text-[var(--on-surface-variant)]'
-                       : 'mx-auto text-[var(--on-surface)]'}"
-        ></Icon>
+        {#if expanded}
+            <Icon icon="material-symbols:search" class="pointer-events-none shrink-0 ml-3 text-[1.25rem] text-[var(--on-surface-variant)]" />
+        {:else}
+            <button
+                id={`${id}-toggle`}
+                type="button"
+                aria-label={placeholder || name}
+                aria-controls={id}
+                aria-expanded="false"
+                class="m3-state-layer relative grid h-10 w-10 shrink-0 place-items-center rounded-full text-[1.25rem] text-[var(--on-surface)] focus-visible:!outline-offset-[-2px]"
+                onclick={expand}
+            >
+                <Icon icon="material-symbols:search" />
+            </button>
+        {/if}
         <input
+            bind:this={input}
             {id}
             {name}
             {placeholder}
+            aria-label={placeholder || name}
             bind:value
-            tabindex={expanded ? 0 : -1}
+            disabled={!expanded}
+            oninput={(event) => onquerychange(event.currentTarget.value)}
             onfocus={handleFocus}
             onblur={handleBlur}
             class="h-full bg-transparent outline-0 text-(--on-surface) caret-(--primary) transition-opacity duration-[var(--m3e-duration-short)]

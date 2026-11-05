@@ -11,6 +11,7 @@ enum I18nKey {
 	archiveGroupCategory = "archiveGroupCategory",
 	archiveGroupTag = "archiveGroupTag",
 	search = "search",
+	searchUnavailable = "searchUnavailable",
 	clear = "clear",
 
 	friends = "friends",

@@ -35,6 +35,7 @@ export const th: Translation = {
 	[Key.archiveGroupYear]: "ตามปี",
 	[Key.archiveGroupCategory]: "ตามหมวดหมู่",
 	[Key.archiveGroupTag]: "ตามแท็ก",
+	[Key.searchUnavailable]: "การค้นหาไม่พร้อมใช้งานชั่วคราว โปรดลองอีกครั้ง",
 	[Key.search]: "ค้นหา",
 	[Key.clear]: "ล้าง",
 

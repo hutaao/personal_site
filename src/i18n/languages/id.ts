@@ -41,6 +41,7 @@ export const id: Translation = {
 	[Key.archiveGroupYear]: "Berdasarkan tahun",
 	[Key.archiveGroupCategory]: "Berdasarkan kategori",
 	[Key.archiveGroupTag]: "Berdasarkan tag",
+	[Key.searchUnavailable]: "Pencarian sementara tidak tersedia. Silakan coba lagi.",
 	[Key.search]: "Cari",
 	[Key.clear]: "Hapus",
 

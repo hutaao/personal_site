@@ -36,6 +36,7 @@ export const ja: Translation = {
 	[Key.archiveGroupYear]: "年別",
 	[Key.archiveGroupCategory]: "カテゴリ別",
 	[Key.archiveGroupTag]: "タグ別",
+	[Key.searchUnavailable]: "現在、検索を利用できません。もう一度お試しください。",
 	[Key.search]: "検索",
 	[Key.clear]: "クリア",
 

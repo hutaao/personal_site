@@ -37,6 +37,7 @@ export const ko: Translation = {
 	[Key.archiveGroupYear]: "연도별",
 	[Key.archiveGroupCategory]: "분류별",
 	[Key.archiveGroupTag]: "태그별",
+	[Key.searchUnavailable]: "현재 검색을 사용할 수 없습니다. 다시 시도해 주세요.",
 	[Key.search]: "검색",
 	[Key.clear]: "지우기",
 

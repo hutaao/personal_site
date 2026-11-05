@@ -35,6 +35,7 @@ export const zh_CN: Translation = {
 	[Key.archiveGroupYear]: "按年份",
 	[Key.archiveGroupCategory]: "按分类",
 	[Key.archiveGroupTag]: "按标签",
+	[Key.searchUnavailable]: "搜索暂不可用，请重试。",
 	[Key.search]: "搜索",
 	[Key.clear]: "清除",
 

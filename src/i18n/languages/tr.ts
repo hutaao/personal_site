@@ -40,6 +40,7 @@ export const tr: Translation = {
 	[Key.archiveGroupYear]: "Yıla göre",
 	[Key.archiveGroupCategory]: "Kategoriye göre",
 	[Key.archiveGroupTag]: "Etikete göre",
+	[Key.searchUnavailable]: "Arama geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
 	[Key.search]: "Ara",
 	[Key.clear]: "Temizle",
 

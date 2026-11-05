@@ -21,14 +21,17 @@ declare global {
 		__shironeUmamiStatsPromises?: Record<string, Promise<OddmiscStatsResult>>;
 		__shironeNavigationBound?: boolean;
 		__shironeSidebarBound?: boolean;
-		pagefind: {
-			search: (query: string) => Promise<{
-				results: Array<{
-					data: () => Promise<SearchResult>;
-				}>;
-			}>;
-		};
+		pagefind?: Pagefind;
+		__loadPagefind?: () => Promise<Pagefind>;
 	}
+}
+
+interface Pagefind {
+	search: (query: string) => Promise<{
+		results: Array<{
+			data: () => Promise<SearchResult>;
+		}>;
+	}>;
 }
 
 interface SearchResult {

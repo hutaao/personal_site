@@ -17,6 +17,9 @@ export interface SearchResultItem {
 let {
 	results = [],
 	query = $bindable(""),
+	onquerychange = () => {},
+	status = "",
+	inert = false,
 	placeholder = "",
 	hideInputOnDesktop = false,
 	id = "",
@@ -24,6 +27,9 @@ let {
 }: {
 	results?: SearchResultItem[];
 	query?: string;
+	onquerychange?: (query: string) => void;
+	status?: string;
+	inert?: boolean;
 	placeholder?: string;
 	hideInputOnDesktop?: boolean;
 	id?: string;
@@ -31,15 +37,18 @@ let {
 } = $props();
 </script>
 
-<div class="m3-blog-searchpanel {className}" {id}>
+<div class="m3-blog-searchpanel {className}" {id} {inert}>
 	{#if placeholder}
 		<div
 			class="m3-blog-searchpanel__input"
 			class:m3-blog-searchpanel__input--hide-desktop={hideInputOnDesktop}
 		>
 			<Icon icon="material-symbols:search" />
-			<input type="search" bind:value={query} {placeholder} aria-label={placeholder} />
+			<input type="search" bind:value={query} {placeholder} aria-label={placeholder} oninput={(event) => onquerychange(event.currentTarget.value)} />
 		</div>
+	{/if}
+	{#if status}
+		<p class="px-3 py-2 text-sm" role="status">{status}</p>
 	{/if}
 	{#each results as item, i (i)}
 		<a class="m3-blog-searchpanel__item" href={item.url}>

@@ -40,6 +40,7 @@ export const vi: Translation = {
 	[Key.archiveGroupYear]: "Theo năm",
 	[Key.archiveGroupCategory]: "Theo danh mục",
 	[Key.archiveGroupTag]: "Theo thẻ",
+	[Key.searchUnavailable]: "Tìm kiếm tạm thời không khả dụng. Vui lòng thử lại.",
 	[Key.search]: "Tìm kiếm",
 	[Key.clear]: "Xóa",
 

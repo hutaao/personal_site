@@ -100,6 +100,15 @@ function isActive(link: (typeof links)[number]): boolean {
 
 <script>
 	import { resolvePageKey } from "@utils/nav-utils";
+	import { createPagefindLoader } from "@utils/pagefind-loader";
+	import { url } from "@utils/url-utils";
+
+	if (import.meta.env.PROD) {
+		window.__loadPagefind ??= createPagefindLoader(
+			new URL(url("/pagefind/pagefind.js"), window.location.origin),
+			(scriptUrl) => import(/* @vite-ignore */ scriptUrl),
+		);
+	}
 
 	function syncTopAppBarNavigation() {
 		setTopAppBarNavigation(resolvePageKey(new URL(window.location.href)));
@@ -182,53 +191,6 @@ function isActive(link: (typeof links)[number]): boolean {
 
 	loadTopAppBar();
 </script>
-
-{import.meta.env.PROD && <script is:inline define:vars={{scriptUrl: url('/pagefind/pagefind.js')}}>
-window.__loadPagefind = function() {
-	if (window.__pagefindLoadingPromise) return window.__pagefindLoadingPromise;
-	window.__pagefindLoadingPromise = (async () => {
-		try {
-			const pagefind = await import(scriptUrl);
-			await pagefind.options({
-				excerptLength: 20
-			});
-			window.pagefind = pagefind;
-			document.dispatchEvent(new CustomEvent('pagefindready'));
-			return pagefind;
-		} catch (error) {
-			console.error('Failed to load Pagefind:', error);
-			window.pagefind = {
-				search: () => Promise.resolve({ results: [] }),
-				options: () => Promise.resolve(),
-			};
-			document.dispatchEvent(new CustomEvent('pagefindloaderror'));
-			return window.pagefind;
-		}
-	})();
-	return window.__pagefindLoadingPromise;
-};
-
-function bindSearchTriggers() {
-	const triggers = [
-		document.getElementById('search-input-desktop'),
-		document.getElementById('search-switch')
-	];
-	for (const el of triggers) {
-		if (!el) continue;
-		if (el.dataset.pagefindBound === 'true') continue;
-		el.dataset.pagefindBound = 'true';
-		el.addEventListener('focus', window.__loadPagefind, { once: true, passive: true });
-		el.addEventListener('click', window.__loadPagefind, { once: true, passive: true });
-	}
-}
-
-if (document.readyState === 'loading') {
-	document.addEventListener('DOMContentLoaded', bindSearchTriggers, { once: true });
-} else {
-	bindSearchTriggers();
-}
-document.addEventListener('swup:content:replace', bindSearchTriggers);
-</script>}
 
 <style>
 	.top-app-bar {

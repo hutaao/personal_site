@@ -35,6 +35,7 @@ export const zh_TW: Translation = {
 	[Key.archiveGroupYear]: "依年份",
 	[Key.archiveGroupCategory]: "依分類",
 	[Key.archiveGroupTag]: "依標籤",
+	[Key.searchUnavailable]: "搜尋暫時無法使用，請重試。",
 	[Key.search]: "搜尋",
 	[Key.clear]: "清除",
 
